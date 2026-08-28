@@ -28,6 +28,7 @@ Weekly_AI_Reports/
 │   ├── install_cron.sh             installs the Tuesday 15:00 crontab entry
 │   ├── publish_to_github.sh        commits the issue and pushes it
 │   └── send_report.py              CSV → personalised mail with the PDF attached
+├── logs/                           run transcripts — local only, never pushed
 └── YYYY-MM-DD/                     one folder per issue
     ├── report.tex
     ├── report.pdf
@@ -101,7 +102,7 @@ missing. Verified under a stripped `env -i` shell.
 (defaulting to the login user). The pipeline sends through **Mandrill**
 (`smtp.mandrillapp.com:587`, account username + `md-` API key).
 
-**Verified by a real send on 2026-08-25:** both recipients reached `state=sent` in the
+**Verified by a real send on 2026-08-25:** all 7 recipients reached `state=sent` in the
 Mandrill API with zero bounces and zero rejects; account reputation 96.
 
 This works despite `kaust.edu.sa` not listing Mandrill in its SPF record, because SPF
@@ -125,16 +126,26 @@ Every issue is committed and pushed to
 (private) at the end of each weekly run. `run_weekly.sh` calls
 `scripts/publish_to_github.sh` once the PDF exists and the mail has gone out.
 
-Two files are deliberately **not** published, and `.gitignore` keeps them out:
+Three things are deliberately **not** published, and `.gitignore` keeps them out:
 
 | Local only | Tracked stand-in | Why |
 |---|---|---|
 | `.env` | `.env.example` | holds the live Mandrill API key |
 | `List_Of_People_To_Send_To.csv` | `List_Of_People_To_Send_To.example.csv` | holds personal addresses |
+| `logs/` | — | see below |
+
+The run log is the reason for the third row, and it is the least obvious of the three.
+`run_weekly.sh` tees the entire transcript of a headless `claude -p` agent into
+`logs/run-<date>.log`, and that agent reads **both** `.env` and the recipient CSV during
+the same run. Anything it chooses to quote — a name, an address, a traceback carrying the
+API key — lands in that file. Publishing it would route around the whole point of ignoring
+the two source files, so the logs stay on the machine.
 
 `.gitignore` alone is not a guarantee — it only protects files that were never added,
 and a `git add -f` would make one tracked forever. So `publish_to_github.sh` re-checks
-the index on every run and refuses to push if either file has become tracked.
+the index on every run and refuses to push if any of the three has become tracked. The
+check uses `:(glob)**/` pathspecs, so a stray `2026-09-01/.env` is caught too, not just
+one at the repo root.
 
 A failed push does **not** mean a lost issue: the report was already built and mailed,
 and the commit is sitting locally. Retry it with
