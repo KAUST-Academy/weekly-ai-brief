@@ -1,0 +1,217 @@
+%==============================================================================
+%  WEEKLY AI BRIEF -- LaTeX template
+%  Engine: tectonic (also compiles with pdflatex/latexmk)
+%  Build:  tectonic -X compile report.tex
+%
+%  HOW TO USE
+%  1. Copy this file to  Weekly_AI_Reports/<YYYY-MM-DD>/report.tex
+%  2. Fill the six \newcommand metadata fields below.
+%  3. Replace every block marked  % >>> REPLACE  with real content.
+%  4. Delete any section you have no material for -- never ship a stub.
+%  Target length: 3-5 pages. The page counter in the footer is your ruler.
+%==============================================================================
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------ packages -------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.2cm,top=2.0cm,bottom=2.3cm]{geometry}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+
+\tcbuselibrary{skins,breakable}
+
+% Logos live in template/ and are shared by every issue -- never copy them into a
+% dated folder. This path list resolves them from <YYYY-MM-DD>/ or from template/.
+\graphicspath{{../template/}{./}{template/}}
+
+%------------------------------ palette --------------------------------------
+\definecolor{brandink}{HTML}{103868}    % KAUST navy -- headings, rules
+\definecolor{brandaccent}{HTML}{0B7480} % KAUST teal (darkened to 5.6:1 on white)
+\definecolor{brandsoft}{HTML}{EAF3F5}   % box fills
+\definecolor{brandgrey}{HTML}{5A6672}   % meta text
+
+\hypersetup{colorlinks=true,linkcolor=brandaccent,urlcolor=brandaccent,
+            citecolor=brandaccent,pdfborder={0 0 0}}
+
+%------------------------------ metadata -------------------------------------
+% >>> REPLACE: the six fields below
+% Issue number: one more than the highest \briefnumber in the existing dated folders.
+% A REBUILD of a window that already has a folder keeps that folder's number -- the
+% number identifies the window, not the run.
+\newcommand{\briefnumber}{01}
+% The window is seven days ending on \briefdate, INCLUSIVE -- so the span is 6 days
+% wide (19--25, not 18--25). Check both endpoints against `date +%F` before shipping.
+\newcommand{\briefweek}{19--25 August 2026}
+\newcommand{\briefdate}{25 August 2026}            % date of publication
+\newcommand{\briefauthor}{Ali Habibullah}          % prepared by
+\newcommand{\briefaffil}{KAUST}                    % affiliation
+\newcommand{\briefscope}{Papers, model releases, benchmarks and policy from the past seven days}
+
+%------------------------------ section styling ------------------------------
+\titleformat{\section}
+  {\normalfont\sffamily\large\bfseries\color{brandink}}{\thesection.}{0.6em}{}
+  [\vspace{-0.55em}{\color{brandaccent}\rule{\textwidth}{0.9pt}}]
+\titlespacing*{\section}{0pt}{1.5ex plus .3ex}{0.9ex}
+
+\titleformat{\subsection}[runin]
+  {\normalfont\sffamily\bfseries\color{brandink}}{}{0pt}{}[\;---]
+\titlespacing*{\subsection}{0pt}{1.25ex plus .2ex}{0.5em}
+
+\setlist[itemize]{leftmargin=1.15em,itemsep=0.25em,topsep=0.35em,parsep=0pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+
+%------------------------------ header / footer ------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{\footnotesize\color{brandgrey}Weekly AI Brief \#\briefnumber\ \textbullet\ \briefweek}
+\fancyfoot[R]{\footnotesize\color{brandgrey}Page \thepage\ of \pageref{LastPage}}
+
+%------------------------------ content macros -------------------------------
+% Executive-summary box.  \tldr{ \item ... \item ... }
+\newcommand{\tldr}[1]{%
+  \begin{tcolorbox}[breakable,enhanced,colback=brandsoft,colframe=brandaccent,
+      boxrule=0.8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,arc=2pt,
+      title={\sffamily\bfseries The week in five lines},fonttitle=\color{white}]
+    \begin{itemize}[leftmargin=1.1em,itemsep=0.3em,topsep=0pt]#1\end{itemize}
+  \end{tcolorbox}}
+
+% One item of news.  \entry{Headline}{Who / venue}{URL}{source-number}
+\newcommand{\entry}[4]{%
+  \par\vspace{0.7em}%
+  {\sffamily\bfseries\color{brandink}#1}\par
+  {\footnotesize\color{brandgrey}#2 \textbullet\ \href{#3}{link} \textbullet\ \srcref{#4}}\par
+  \vspace{0.15em}}
+
+% "Why it matters" line -- one sentence, no hedging.
+\newcommand{\why}[1]{\par{\small\textbf{Why it matters.} #1}\par}
+
+% Numbered pointer into SOURCES.md / the source table.
+\newcommand{\srcref}[1]{\textcolor{brandaccent}{[S#1]}}
+
+% Numbers worth pulling out of a paragraph.
+\newcommand{\stat}[2]{{\sffamily\bfseries\color{brandink}#1}~{\footnotesize\color{brandgrey}#2}}
+
+%==============================================================================
+\begin{document}
+
+%------------------------------ title block ----------------------------------
+% KAUST Academy top-left, KAUST top-right. Heights differ because the two marks
+% have different aspect ratios; these values make them optically equal.
+\noindent
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedright\includegraphics[height=1.4cm]{KAUST_Academy_Logo.png}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedleft\includegraphics[height=1.5cm]{KAUST_Logo.png}
+\end{minipage}
+\vspace{0.7em}
+
+{\sffamily
+ {\color{brandgrey}\footnotesize ISSUE \#\briefnumber\ \textbullet\ \briefdate}\par
+ \vspace{0.15em}
+ {\LARGE\bfseries\color{brandink}Weekly AI Brief}\par
+ \vspace{0.25em}
+ {\large\color{brandaccent}\briefweek}\par
+ \vspace{0.35em}
+ {\footnotesize\color{brandgrey}\briefscope\\
+  Prepared by \briefauthor, \briefaffil}\par}
+\vspace{0.3em}
+{\color{brandink}\rule{\textwidth}{1.4pt}}
+\vspace{0.6em}
+
+%------------------------------ 1. executive summary -------------------------
+% >>> REPLACE: five lines, each one concrete claim with a number or a name.
+\tldr{
+  \item \textbf{Headline one.} One sentence a busy reader can repeat in a meeting. \srcref{1}
+  \item \textbf{Headline two.} Concrete, with the number that matters. \srcref{2}
+  \item \textbf{Headline three.} Name the lab and the artifact. \srcref{3}
+  \item \textbf{Headline four.} Say what changed, not that something changed. \srcref{4}
+  \item \textbf{Headline five.} End on the one to watch. \srcref{5}
+}
+
+%------------------------------ 2. models & releases -------------------------
+\section{Model and product releases}
+% >>> REPLACE: 2-4 entries. Weights, context, pricing, licence -- facts only.
+\entry{Model name and version}{Lab \textbullet\ release type}{https://example.com}{1}
+Two or three sentences: what it is, what is new versus the previous version,
+what is actually available (weights, API, waitlist) and under which licence.
+Quote benchmark numbers only with the benchmark named and the number verified.
+\why{One sentence on the consequence for people building on this.}
+
+%------------------------------ 3. research ----------------------------------
+\section{Research worth reading}
+% >>> REPLACE: 3-5 papers. Prefer results that change practice over incremental SOTA.
+\entry{Paper title}{Authors / institution \textbullet\ arXiv:XXXX.XXXXX}{https://arxiv.org/abs/XXXX.XXXXX}{2}
+What problem it attacks, the method in one clause, and the headline result with its
+number and baseline. State the setup honestly -- model size, dataset, compute --
+so the reader can judge whether it transfers.
+\why{One sentence: what this unlocks, or what it invalidates.}
+
+%------------------------------ 4. benchmarks & evals ------------------------
+\section{Benchmarks, evaluations and reproductions}
+% >>> REPLACE or DELETE this section if the week had nothing here.
+\begin{tabularx}{\textwidth}{@{}l l r X@{}}
+\toprule
+\textbf{Benchmark} & \textbf{Top entry} & \textbf{Score} & \textbf{Note} \\
+\midrule
+Name & Model & 00.0 & What moved and by how much \\
+Name & Model & 00.0 & Prior best and who held it \\
+\bottomrule
+\end{tabularx}
+\vspace{0.4em}
+
+One short paragraph on whether the movement is real: contamination checks,
+independent reproduction, evaluation harness differences.
+
+%------------------------------ 5. industry & policy -------------------------
+\section{Industry, funding and policy}
+% >>> REPLACE: 2-4 short items. Money, compute, regulation, access.
+\begin{itemize}
+  \item \textbf{Item.} One or two sentences with the figure and the date. \srcref{3}
+  \item \textbf{Item.} Regulation: what it requires and when it binds. \srcref{4}
+\end{itemize}
+
+%------------------------------ 6. what to watch -----------------------------
+\section{What to watch next week}
+% >>> REPLACE: 3 forward-looking items -- scheduled releases, conference deadlines,
+%     open questions this week raised. Each must be checkable next Tuesday.
+\begin{itemize}
+  \item Concrete expected event and the date it is expected.
+  \item An open question this week's results raised.
+  \item A claim that needs independent reproduction before it is believed.
+\end{itemize}
+
+%------------------------------ 7. sources -----------------------------------
+\section{Sources}
+% >>> REPLACE: every \srcref{n} used above must appear here, same numbering as
+%     SOURCES.md in this folder. Accessed date = the day the brief was built.
+{\footnotesize
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\textbf{\#} & \textbf{Reference} \\
+\midrule
+S1 & Author/Org. \emph{Title}. Outlet, date. \url{https://example.com} \\
+S2 & Author/Org. \emph{Title}. arXiv:XXXX.XXXXX, date. \url{https://arxiv.org/abs/XXXX.XXXXX} \\
+\bottomrule
+\end{tabularx}}
+
+\vspace{0.8em}
+{\footnotesize\color{brandgrey}
+Compiled \briefdate. Every figure in this brief was read from the linked primary
+source on that date. Corrections: \texttt{\briefauthor}.}
+
+\end{document}
