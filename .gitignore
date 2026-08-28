@@ -1,0 +1,15 @@
+# Live SMTP credentials (Mandrill API key). The tracked file is .env.example.
+.env
+
+# Real recipient list -- personal addresses stay off GitHub.
+# The tracked file is List_Of_People_To_Send_To.example.csv.
+List_Of_People_To_Send_To.csv
+
+# Jupyter writes copies of every file it opens here, including the recipient CSV.
+.ipynb_checkpoints/
+
+# Dry runs are scratch output, never an issue.
+.dryrun-*/
+
+__pycache__/
+*.pyc
