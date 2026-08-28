@@ -16,16 +16,20 @@ CONDA_BIN="/ibex/user/habiam0b/miniconda3/bin"
 CLAUDE="${CLAUDE_BIN:-$HOME/.local/bin/claude}"
 LOGDIR="$ROOT/logs"
 STAMP="$(date +%F)"
-LOG="$LOGDIR/run-$STAMP.log"
 
 mkdir -p "$LOGDIR"
+HEALTH="ok"
 export PATH="$CONDA_BIN:$HOME/bin:$HOME/.local/bin:$PATH"
 
+# A dry run must not append to the live issue's log -- that log is the audit record of
+# what was actually built and mailed, and interleaving a rehearsal into it corrupts it.
 if [[ "${DRY_RUN:-0}" == "1" ]]; then
   OUTDIR="$ROOT/.dryrun-$STAMP"      # never touches a real issue folder
+  LOG="$LOGDIR/dryrun-$STAMP.log"
   SEND_CLAUSE="Do NOT send any email; stop after building the PDF and writing SOURCES.md."
 else
   OUTDIR="$ROOT/$STAMP"
+  LOG="$LOGDIR/run-$STAMP.log"
   SEND_CLAUSE="Then send it to everyone in List_Of_People_To_Send_To.csv without asking for confirmation -- this is the scheduled unattended run."
 fi
 
@@ -64,7 +68,10 @@ fi
   echo "--- claude exited $STATUS ---"
   if [[ -f "$OUTDIR/report.pdf" ]]; then
     echo "OK: $OUTDIR/report.pdf ($(stat -c%s "$OUTDIR/report.pdf") bytes)"
-    python3 "$ROOT/scripts/check_sources.py" "$OUTDIR" || STATUS=1
+    if ! python3 "$ROOT/scripts/check_sources.py" "$OUTDIR"; then
+      STATUS=1
+      HEALTH="check-failed"
+    fi
   else
     echo "FAIL: no PDF produced at $OUTDIR/report.pdf"
     STATUS=1
@@ -77,10 +84,10 @@ fi
   # nothing to publish; a missing PDF means the run failed and there is nothing to
   # commit either. A push failure does not undo the mail that already went out -- it
   # just needs retrying, so it is reported rather than treated as a lost issue.
-  # The log committed here stops at this line; its tail is picked up by next week's
-  # commit, which restages any tracked log that changed.
+  # An issue whose source check failed is still published, because it was still mailed
+  # -- but $HEALTH makes the commit message say so instead of looking clean.
   if [[ "${DRY_RUN:-0}" != "1" && "${PUBLISH:-1}" == "1" && -f "$OUTDIR/report.pdf" ]]; then
-    bash "$ROOT/scripts/publish_to_github.sh" "$STAMP" || {
+    bash "$ROOT/scripts/publish_to_github.sh" "$STAMP" "$HEALTH" || {
       echo "WARN: the issue was built and mailed but not pushed -- retry with:"
       echo "      bash $ROOT/scripts/publish_to_github.sh $STAMP"
       STATUS=1
