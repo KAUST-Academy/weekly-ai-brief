@@ -11,5 +11,8 @@ List_Of_People_To_Send_To.csv
 # Dry runs are scratch output, never an issue.
 .dryrun-*/
 
+# Tectonic's build log -- machine noise, regenerable from the committed report.tex.
+*/report.log
+
 __pycache__/
 *.pyc
