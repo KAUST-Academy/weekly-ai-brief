@@ -1,0 +1,333 @@
+%==============================================================================
+%  WEEKLY AI BRIEF #01 -- 19--25 August 2026
+%  Engine: tectonic  (tectonic -X compile report.tex)
+%==============================================================================
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------ packages -------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.2cm,top=2.0cm,bottom=2.3cm]{geometry}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+
+\tcbuselibrary{skins,breakable}
+
+% Logos live in template/ and are shared by every issue.
+\graphicspath{{../template/}{./}{template/}}
+
+%------------------------------ palette --------------------------------------
+\definecolor{brandink}{HTML}{103868}    % KAUST navy -- headings, rules
+\definecolor{brandaccent}{HTML}{0B7480} % KAUST teal (darkened to 5.6:1 on white)
+\definecolor{brandsoft}{HTML}{EAF3F5}   % box fills
+\definecolor{brandgrey}{HTML}{5A6672}   % meta text
+
+\hypersetup{colorlinks=true,linkcolor=brandaccent,urlcolor=brandaccent,
+            citecolor=brandaccent,pdfborder={0 0 0}}
+
+%------------------------------ metadata -------------------------------------
+\newcommand{\briefnumber}{01}
+\newcommand{\briefweek}{19--25 August 2026}
+\newcommand{\briefdate}{25 August 2026}
+\newcommand{\briefauthor}{Ali Habibullah}
+\newcommand{\briefaffil}{KAUST}
+\newcommand{\briefscope}{Papers, model releases, benchmarks and policy from the past seven days}
+
+%------------------------------ section styling ------------------------------
+\titleformat{\section}
+  {\normalfont\sffamily\large\bfseries\color{brandink}}{\thesection.}{0.6em}{}
+  [\vspace{-0.55em}{\color{brandaccent}\rule{\textwidth}{0.9pt}}]
+\titlespacing*{\section}{0pt}{1.5ex plus .3ex}{0.9ex}
+
+\titleformat{\subsection}[runin]
+  {\normalfont\sffamily\bfseries\color{brandink}}{}{0pt}{}[\;---]
+\titlespacing*{\subsection}{0pt}{1.25ex plus .2ex}{0.5em}
+
+\setlist[itemize]{leftmargin=1.15em,itemsep=0.25em,topsep=0.35em,parsep=0pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+
+%------------------------------ header / footer ------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{\footnotesize\color{brandgrey}Weekly AI Brief \#\briefnumber\ \textbullet\ \briefweek}
+\fancyfoot[R]{\footnotesize\color{brandgrey}Page \thepage\ of \pageref{LastPage}}
+
+%------------------------------ content macros -------------------------------
+\newcommand{\tldr}[1]{%
+  \begin{tcolorbox}[breakable,enhanced,colback=brandsoft,colframe=brandaccent,
+      boxrule=0.8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,arc=2pt,
+      title={\sffamily\bfseries The week in five lines},fonttitle=\color{white}]
+    \begin{itemize}[leftmargin=1.1em,itemsep=0.3em,topsep=0pt]#1\end{itemize}
+  \end{tcolorbox}}
+
+\newcommand{\entry}[4]{%
+  \par\vspace{0.7em}%
+  {\sffamily\bfseries\color{brandink}#1}\par
+  {\footnotesize\color{brandgrey}#2 \textbullet\ \href{#3}{link} \textbullet\ \srcref{#4}}\par
+  \vspace{0.15em}}
+
+\newcommand{\why}[1]{\par{\small\textbf{Why it matters.} #1}\par}
+
+\newcommand{\srcref}[1]{\textcolor{brandaccent}{[S#1]}}
+
+\newcommand{\stat}[2]{{\sffamily\bfseries\color{brandink}#1}~{\footnotesize\color{brandgrey}#2}}
+
+%==============================================================================
+\begin{document}
+
+%------------------------------ title block ----------------------------------
+\noindent
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedright\includegraphics[height=1.4cm]{KAUST_Academy_Logo.png}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedleft\includegraphics[height=1.5cm]{KAUST_Logo.png}
+\end{minipage}
+\vspace{0.7em}
+
+{\sffamily
+ {\color{brandgrey}\footnotesize ISSUE \#\briefnumber\ \textbullet\ \briefdate}\par
+ \vspace{0.15em}
+ {\LARGE\bfseries\color{brandink}Weekly AI Brief}\par
+ \vspace{0.25em}
+ {\large\color{brandaccent}\briefweek}\par
+ \vspace{0.35em}
+ {\footnotesize\color{brandgrey}\briefscope\\
+  Prepared by \briefauthor, \briefaffil}\par}
+\vspace{0.3em}
+{\color{brandink}\rule{\textwidth}{1.4pt}}
+\vspace{0.6em}
+
+%------------------------------ 1. executive summary -------------------------
+\tldr{
+  \item \textbf{Coding agents cannot yet migrate a repository.} On the new SWE
+        Refactor Bench, 28 of 520 runs (5.4\%) passed all three grading stages;
+        the best model, \texttt{claude-opus-5}, scored 47.0/100. \srcref{3}
+  \item \textbf{DeepSeek put vision into V4-Flash at text prices.} Images bill at
+        up to 384 tokens each on the existing V4-Flash rate card. API only, no
+        weights, and every quoted score is DeepSeek's own. \srcref{1}
+  \item \textbf{A harness, not a model, moved ARC-AGI-3.} Prime Agent reports
+        RHAE Best@1 rising from 30\% to 95.5\% with the code released. \srcref{4}
+  \item \textbf{Alibaba raised HK\$80bn (US\$10.2bn) on 23 August} in a Hong Kong
+        share placement earmarked for full-stack AI capability. \srcref{10}
+  \item \textbf{Nvidia is reported to be paying Poolside \$6bn} to license its
+        Model Factory, plus \$1bn invested at a \$12bn pre-money valuation.
+        Nvidia has not announced this. \srcref{11}
+}
+
+%------------------------------ 2. models & releases -------------------------
+\section{Model and product releases}
+
+\entry{DeepSeek-V4-Flash-Vision-Exp}{DeepSeek \textbullet\ experimental API model}{https://api-docs.deepseek.com/news/news260821}{1}
+DeepSeek added image input to V4-Flash on 21 August. Images are tokenised for
+billing at up to 384 tokens each and charged at the existing V4-Flash rate card,
+so vision carries no separate premium. The model is served through the Chat
+Completions, Messages and Responses APIs and accepts base64, external URLs or a
+new free Files API; there are no downloadable weights. DeepSeek states that on
+multimodal agent benchmarks the model ``makes a major leap over V4-Flash,
+bringing multimodal agent performance close to Opus-4.8'' --- that comparison is
+self-reported and we found no independent reproduction of it.
+\why{Vision at text-token prices removes the usual cost argument for keeping a
+separate captioning model in an agent pipeline.}
+
+\entry{Groq 3 LPX in full production; Vera Rubin NVL72}{NVIDIA \textbullet\ hardware announcements, 24 August}{https://nvidianews.nvidia.com/news}{2}
+NVIDIA announced on 24 August that its Groq 3 LPX inference accelerator has
+entered full production, and published performance claims for Vera Rubin NVL72
+of up to 30$\times$ more work per watt on agentic workloads. A companion release
+states that SpaceXAI will adopt the Vera CPU. The per-watt figure is a vendor
+claim on a vendor-chosen workload mix; the newsroom items do not publish the
+benchmark methodology behind it.
+\why{If the per-watt claim survives third-party measurement, inference cost per
+agent trajectory --- not per token --- becomes the number worth budgeting against.}
+
+%------------------------------ 3. research ----------------------------------
+\section{Research worth reading}
+
+Candidates were drawn from arXiv cs.CL new listings and from the community
+ranking on Hugging Face Daily Papers for 25 August \srcref{12}; every arXiv
+identifier, date and figure below was then read from the paper's own abstract
+page rather than from the ranking.
+
+\entry{SWE Refactor Bench: Can Coding Agents Complete a Long-Horizon, Whole-Repository Stack Migration?}{Hong et al. \textbullet\ arXiv:2608.23564}{https://arxiv.org/abs/2608.23564}{3}
+The benchmark asks agents to migrate an entire repository to a different stack,
+and its central contribution is a grading protocol rather than a task set. The
+authors name a failure they call ``Blindness'': agents pass tests by copying the
+original code instead of migrating it. Their three stages check migration
+completion, behavioural correctness, and hidden behavioural differences via
+independent agent verification. Across 8 frontier models and 26 model-effort
+configurations (520 runs), 28 runs --- 5.4\% --- passed all three stages, and 13
+of 20 tasks received no accepted solution at all. The gap by task type is the
+useful signal: 31.4 on build-toolchain rewrites against 5.6 on language rewrites.
+\why{A test suite that goes green is not evidence of a completed migration, which
+makes independent behavioural checks a prerequisite for trusting agent refactors.}
+
+\entry{Prime Agent: A Self-Improving RLM Harness}{Karten, Zhang, Thomas et al. \textbullet\ arXiv:2608.23552}{https://arxiv.org/abs/2608.23552}{4}
+An open-source harness that persists histories, memories, skills, prompts and
+subagent specifications across trajectories, built around a persistent IPython
+REPL following the Recursive Language Model abstraction. The reported headline is
+ARC-AGI-3 RHAE Best@1 moving from 30\% to 95.5\%, with further results on
+long-context coding, GPU-kernel generation and autonomous nanoGPT speedruns. Code
+is released under CC BY 4.0 at \texttt{github.com/PrimeIntellect-ai/prime-agent}.
+The numbers are the authors' own; what makes them checkable is that the harness
+ships.
+\why{It relocates a large capability gain from model weights to scaffolding,
+which is the cheaper half of the stack to change.}
+
+\entry{Apodex 1.1: Scaling Agentic Intelligence for Complex Work}{Apodex Team (70 authors) \textbullet\ arXiv:2608.23283}{https://arxiv.org/abs/2608.23283}{5}
+A report on two scaling axes for agents: Environment Scaling, which broadens the
+diversity and verifiability of executable file, search and code environments, and
+Agentic Coordination Scaling, which trains decomposition, delegation of parallel
+work, integration of asynchronous results and replanning. A shared execution
+harness and an ``AgentOS'' hold state across tools. A 35B locally deployable
+variant, Apodex 1.1 Mini, is described. The paper claims a leading performance
+band across finance, scientific research, mathematics, coding and search, but the
+abstract page does not carry the per-benchmark table, and we did not find a
+weights release to check against.
+\why{The claim under test is that environment diversity, not parameter count,
+is now the binding constraint on agent quality.}
+
+\entry{On the Threat Model of Weird Generalization and Emergent Misalignment}{Wanner, Dredze \& Walden \textbullet\ arXiv:2608.23476}{https://arxiv.org/abs/2608.23476}{6}
+Narrow fine-tuning on small datasets can produce broad, unintended behavioural
+change. This paper takes that phenomenon apart and finds it depends far more on
+dataset composition and language than on dataset size, that it is stronger when
+the fine-tuning data resembles pretraining data than when it is novel, and that
+measurements of it are sensitive to which evaluation questions are asked. The
+authors conclude it behaves as an adversarial threat requiring deliberate data
+engineering, rather than as a hazard inherent to routine fine-tuning.
+\why{It downgrades a widely cited risk from ambient to adversarial, which changes
+who has to defend against it and how.}
+
+\entry{MobilePA-Bench: Benchmarking Mobile Planner Agents on Complex Real-World Tasks}{Zhu, Wu, Wang et al. \textbullet\ arXiv:2608.23035}{https://arxiv.org/abs/2608.23035}{7}
+An interactive benchmark that evaluates mobile agents in an executable sandbox
+maintaining live application databases, spanning 13 functional domains and 212
+tools, rather than scoring screen interactions or API string matches. It probes
+sub-agent collaboration, memory for implicit requests, and invocation of
+pre-packaged skills. The authors report that frontier LLMs remain unreliable in
+this setting, with performance dropping sharply under strict tool ordering,
+permission limits and unexpected runtime errors.
+\why{Stateful evaluation exposes the failure modes --- ordering, permissions,
+runtime errors --- that static tool-call benchmarks are structurally blind to.}
+
+\entry{ReWorld and EchoWM: two interactive world models}{Chen et al.; Zhang et al. \textbullet\ arXiv:2608.23565, arXiv:2608.23189}{https://arxiv.org/abs/2608.23565}{8}
+ReWorld targets the tension between responsive user control and long-horizon
+memory, using mixed attention windows with global heads plus a pose-indexed
+landmark bank on a fixed inference memory budget. It reports 11.95$^\circ$
+rotation error, 64-second out-and-back rollouts at 704$\times$1280, and best
+control fidelity against six recent interactive world models. EchoWM generates
+interactive 720p video together with environmental sound, music and speech, and
+unifies discrete and continuous control across first- and third-person scenes
+through a shared trajectory representation \srcref{9}. Neither abstract page
+states weights availability.
+\why{Persistent scene memory under a fixed budget is what separates a video
+generator from something an agent can be trained inside.}
+
+%------------------------------ 4. benchmarks & evals ------------------------
+\section{Benchmarks, evaluations and reproductions}
+
+\begin{tabularx}{\textwidth}{@{}l l r X@{}}
+\toprule
+\textbf{Benchmark} & \textbf{Top entry} & \textbf{Score} & \textbf{Note} \\
+\midrule
+SWE Refactor Bench      & \texttt{claude-opus-5} & 47.0 & Best of 8 frontier models; 5.4\% of 520 runs pass all 3 stages \\
+-- build-toolchain subset & (all models)         & 31.4 & Task-type split within the same benchmark \\
+-- language-rewrite subset & (all models)        & 5.6  & Same models, same harness; the harder half \\
+ARC-AGI-3 (RHAE, Best@1) & Prime Agent harness   & 95.5 & Up from 30.0; harness change, model held constant \\
+\bottomrule
+\end{tabularx}
+\vspace{0.4em}
+
+Every figure above is reported by the authors of the benchmark or harness that
+produced it, and none has an independent reproduction as of 25 August. The two
+are not comparable to each other: SWE Refactor Bench grades whether a migration
+actually happened across 520 runs, while the ARC-AGI-3 figure is a Best@1
+selection over repeated attempts, which is a materially easier statistic. The
+SWE Refactor Bench result is the more load-bearing of the two, because its
+contribution is an audit protocol designed to catch agents that pass tests
+without doing the work --- the failure mode it names is one that previous
+migration benchmarks would have scored as success \srcref{3}. Treat the
+ARC-AGI-3 jump as a claim awaiting third-party runs; the code being public makes
+that check cheap, and it is the single most worthwhile reproduction of the week
+\srcref{4}.
+
+%------------------------------ 5. industry & policy -------------------------
+\section{Industry, funding and policy}
+\begin{itemize}
+  \item \textbf{Alibaba raised HK\$80bn (US\$10.2bn).} The Hong Kong share
+        placement was reported on 23 August, with the company stating proceeds
+        would fund full-stack AI capability including expanded AI infrastructure.
+        Share count and price per share were not confirmed against the filing
+        itself for this issue. \srcref{10}
+  \item \textbf{Nvidia and Poolside: \$6bn licence, \$1bn investment.} Newcomer
+        reported on 20 August, citing a letter to investors, that Nvidia will pay
+        \$6bn to license Poolside's Model Factory and invest a further \$1bn at a
+        \$12bn pre-money valuation. This is single-source reporting from a
+        document, not an announcement: it does not appear in Nvidia's newsroom,
+        and neither company has confirmed it. Headcount figures circulating
+        alongside it could not be verified. \srcref{11}
+  \item \textbf{The policy beat was quiet.} The month's binding dates --- EU AI
+        Act transparency obligations and California SB 942 --- both fell on
+        2 August, outside this window. No new AI regulation, enforcement action
+        or export-control change published between 19 and 25 August could be
+        confirmed against a primary source, so none is reported here.
+\end{itemize}
+
+%------------------------------ 6. what to watch -----------------------------
+\section{What to watch next week}
+\begin{itemize}
+  \item Whether anyone reproduces Prime Agent's 30\% $\rightarrow$ 95.5\%
+        ARC-AGI-3 RHAE result. The code is public, so an independent run is a
+        weekend's work and the absence of one after two weeks would itself be
+        informative. \srcref{4}
+  \item Whether Nvidia confirms the Poolside arrangement. A \$6bn licence should
+        surface in a newsroom post or a quarterly filing; if it does not, the
+        investor-letter sourcing stays the only evidence. \srcref{11}
+  \item Whether DeepSeek promotes V4-Flash-Vision out of ``exp'' status and
+        publishes a benchmark table others can run. Right now the Opus-4.8
+        comparison rests entirely on DeepSeek's own measurement. \srcref{1}
+  \item Whether SWE Refactor Bench attracts submissions from labs other than the
+        eight already evaluated. A migration benchmark that only its authors run
+        does not stay a benchmark for long. \srcref{3}
+\end{itemize}
+
+%------------------------------ 7. sources -----------------------------------
+\section{Sources}
+{\footnotesize
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\textbf{\#} & \textbf{Reference} \\
+\midrule
+S1 & DeepSeek. \emph{DeepSeek-V4-Flash-Vision-Exp release note}. 21 Aug 2026. \url{https://api-docs.deepseek.com/news/news260821} \\
+S2 & NVIDIA. \emph{Newsroom: Groq 3 LPX full production; Vera Rubin NVL72; SpaceXAI Vera CPU}. 24 Aug 2026. \url{https://nvidianews.nvidia.com/news} \\
+S3 & Hong, D. et al. \emph{SWE Refactor Bench: Can Coding Agents Complete a Long-Horizon, Whole-Repository Stack Migration?} arXiv:2608.23564, 24 Aug 2026. \url{https://arxiv.org/abs/2608.23564} \\
+S4 & Karten, S. et al. \emph{Prime Agent: A Self-Improving RLM Harness}. arXiv:2608.23552, 24 Aug 2026. \url{https://arxiv.org/abs/2608.23552} \\
+S5 & Apodex Team. \emph{Apodex 1.1: Scaling Agentic Intelligence for Complex Work}. arXiv:2608.23283, 24 Aug 2026. \url{https://arxiv.org/abs/2608.23283} \\
+S6 & Wanner, M., Dredze, M. \& Walden, W. \emph{On the Threat Model of Weird Generalization and Emergent Misalignment}. arXiv:2608.23476, 24 Aug 2026. \url{https://arxiv.org/abs/2608.23476} \\
+S7 & Zhu, Y. et al. \emph{MobilePA-Bench: Benchmarking Mobile Planner Agents on Complex Real-World Tasks}. arXiv:2608.23035, 24 Aug 2026. \url{https://arxiv.org/abs/2608.23035} \\
+S8 & Chen, Z. et al. \emph{ReWorld: An Interactive World Model with Long-Horizon Memory}. arXiv:2608.23565, 24 Aug 2026. \url{https://arxiv.org/abs/2608.23565} \\
+S9 & Zhang, S. et al. \emph{EchoWM: Open and Enterable Omnimodal World Models}. arXiv:2608.23189, 24 Aug 2026. \url{https://arxiv.org/abs/2608.23189} \\
+S10 & South China Morning Post. \emph{Alibaba to issue HK\$80 billion in new shares for global AI push}. 23 Aug 2026. \url{https://www.scmp.com/tech/big-tech/article/3364957/alibaba-issue-hk80-billion-new-shares-global-ai-push} \\
+S11 & Newcomer. \emph{Poolside Strikes \$6 Billion Licensing Deal with Nvidia}. 20 Aug 2026. \url{https://www.newcomer.co/p/sources-poolside-strikes-6-billion} \\
+S12 & Hugging Face. \emph{Daily Papers, 25 August 2026}. \url{https://huggingface.co/papers} \\
+\bottomrule
+\end{tabularx}}
+
+\vspace{0.8em}
+{\footnotesize\color{brandgrey}
+Compiled \briefdate. Every figure in this brief was read from the linked primary
+source on that date. Where a number is self-reported or single-sourced, the
+sentence carrying it says so. Corrections: \texttt{\briefauthor}.}
+
+\end{document}
