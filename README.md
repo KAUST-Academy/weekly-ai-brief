@@ -24,8 +24,11 @@ Weekly_AI_Reports/
 ├── scripts/
 │   ├── build_report.py             tex → pdf, enforces the 3–5 page budget
 │   ├── check_sources.py            srcref ↔ SOURCES.md correspondence check
-│   ├── run_weekly.sh               unattended end-to-end run (cron target)
+│   ├── submit_weekly.sh            queues the Slurm job (cron target)
+│   ├── weekly_job.sbatch           the job: runs the brief on a compute node
+│   ├── run_weekly.sh               unattended end-to-end run (what the job runs)
 │   ├── check_auth.sh               is the Claude login usable? (preflight)
+│   ├── check_issue.sh              did an issue actually appear this week?
 │   ├── auth_keepalive.sh           daily token refresh + early warning (cron target)
 │   ├── notify.py                   emails an operational alert when a run fails
 │   ├── install_cron.sh             installs all three crontab entries
@@ -70,22 +73,27 @@ bash /ibex/user/habiam0b/Weekly_AI_Reports/scripts/install_cron.sh   # idempoten
 crontab -l                                                          # verify
 ```
 
-That installs three lines:
+That installs four lines:
 
 ```
 0  9 * * *  .../scripts/auth_keepalive.sh    keep the login warm, warn early if it dies
 45 14 * * 2 .../scripts/auth_keepalive.sh    one more refresh, 15 min before the build
-0  15 * * 2 .../scripts/run_weekly.sh        build, mail, publish
+0  15 * * 2 .../scripts/submit_weekly.sh     queue the build as a Slurm job
+0  9 * * 3  .../scripts/check_issue.sh       did an issue actually appear?
 ```
 
-`run_weekly.sh` invokes `claude -p` against the `weekly-ai-report` skill, builds into a dated
-folder, sends, then runs `check_sources.py` — logging each run to `logs/run-YYYY-MM-DD.log`
-and keeping the last 12.
+Cron only **queues** the work — see [why it runs on a compute node](#why-it-runs-on-a-compute-node).
+The job runs `run_weekly.sh`, which invokes `claude -p` against the `weekly-ai-report` skill,
+builds into a dated folder, sends, then runs `check_sources.py` — logging each run to
+`logs/run-YYYY-MM-DD.log` and keeping the last 12.
 
 ```bash
-DRY_RUN=1 bash scripts/run_weekly.sh   # builds into .dryrun-<date>/, sends nothing
-FORCE=1   bash scripts/run_weekly.sh   # rebuild + resend an issue that already exists
+bash scripts/submit_weekly.sh          # queue a real run now
+squeue -u $USER -n weekly-ai-brief     # watch it
+FORCE=1 bash scripts/submit_weekly.sh  # rebuild + resend an existing issue
 bash scripts/install_cron.sh --remove  # uninstall the schedule
+
+DRY_RUN=1 bash scripts/run_weekly.sh   # rehearse directly (no Slurm, no mail)
 ```
 
 Four safeguards worth knowing about:
@@ -104,6 +112,25 @@ sourced — conda is absent and bare `python3` would be `/usr/bin/python3` (3.9,
 which would silently drop the page-budget check). `run_weekly.sh` therefore puts
 `miniconda3/bin`, `~/bin` and `~/.local/bin` on PATH explicitly and warns if pymupdf is still
 missing. Verified under a stripped `env -i` shell.
+
+## Why it runs on a compute node
+
+The agent **cannot run on an IBEX login node.** It was tried twice on 2026-09-04 and killed
+both times — `SIGKILL`, exit 137, once at 38 seconds and again at 110 seconds with the SSH
+session held open, so it is not a disconnect artefact.
+
+It is also not memory: the user cgroup reported `oom_kill 0` with a peak of 23 MB against a
+20 GiB cap, and the only OOM in `dmesg` belonged to another user. A login-node reaper sweeps
+up sustained processes, and a research agent that runs for 10–30 minutes is exactly its
+target. Login nodes are for light work, so the work moved rather than fighting the policy.
+
+Cron still fires on the login node, because *submitting* a job is light. `submit_weekly.sh`
+calls `sbatch`; `weekly_job.sbatch` runs the brief on a compute node with 4 CPUs, 16 GB and a
+two-hour limit. Compute nodes reach everything the run needs — the Anthropic API, the Mandrill
+relay, and GitHub.
+
+The trade-off is queue time: the brief goes out when the job starts, not exactly at 15:00.
+On `batch` that is usually seconds.
 
 ## Keeping the Claude login alive
 
@@ -153,6 +180,11 @@ tail -40 /ibex/user/habiam0b/Weekly_AI_Reports/logs/cron.log     # what cron saw
 ```
 
 Dry runs suppress alerts — a rehearsal you are watching should not mail you.
+
+**The backstop.** Every alert above fires from *inside* a run. If the Slurm job never starts —
+queue backlog, node failure, a submission that vanished — nothing runs and nothing complains,
+and silence looks exactly like success. `check_issue.sh` runs Wednesday morning and checks for
+the artefact itself: if no `<date>/report.pdf` has appeared in the last 8 days, it says so.
 
 ## Sending: SMTP relay and deliverability
 
