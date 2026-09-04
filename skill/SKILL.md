@@ -53,6 +53,22 @@ Two rules govern this phase, and they are the whole point of the brief:
 - **Never invent an identifier.** arXiv IDs, model version strings, dates and dollar
   figures are either copied from a page you fetched or they do not appear.
 
+**openai.com needs a different door.** Your fetch tool gets `403` on every openai.com
+content page -- so does `curl` -- because their edge rejects those clients. It is not a
+policy: their `robots.txt` is `User-agent: * / Allow: /`. Two issues in a row sourced the
+week's biggest release entirely from secondaries because of this. Use the helper, which
+reads the page with a client the edge accepts and falls back to a dated archive copy:
+
+```bash
+python3 scripts/fetch_openai.py --since <window start>   # what OpenAI has published
+python3 scripts/fetch_openai.py --url https://openai.com/index/<slug>/
+```
+
+`--since` lists candidate slugs from OpenAI's own sitemap. Its dates are re-render dates,
+not publication dates, so read each page for its real date. If the helper cannot reach a
+page either, say in the report that the primary could not be read -- do not quietly promote
+a secondary into its place.
+
 Aim to surface 20-30 candidates, so that selection is a real filter rather than a formality.
 Log every candidate as you go -- URL, date, one line of what it claims -- because Phase 5
 needs the ones you rejected too.
@@ -168,6 +184,7 @@ Each recipient gets their own message with a first-name greeting and the PDF att
 | Symptom | Do this |
 |---|---|
 | No network / searches fail | Stop. Do not write from memory. Report the failure; a missed week beats a fabricated one. |
+| `403` from openai.com | Expected -- the fetch tool is blocked there. Use `python3 scripts/fetch_openai.py --url <page>`. Never fall back to secondaries without trying it. |
 | tectonic missing | Reinstall: musl binary from the tectonic GitHub releases into `~/bin`. |
 | Over 5 pages | Drop the weakest item entirely. Never shrink margins or font size. |
 | SMTP auth fails | `.env` is missing or the credential rotated. Report it; the PDF is still saved. |
