@@ -1,0 +1,354 @@
+%==============================================================================
+%  WEEKLY AI BRIEF #02 -- 29 August to 4 September 2026
+%  Engine: tectonic
+%==============================================================================
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------ packages -------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.2cm,top=2.0cm,bottom=2.3cm]{geometry}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}   % break long source URLs anywhere -- keeps the table in its column
+
+\tcbuselibrary{skins,breakable}
+
+\graphicspath{{../template/}{./}{template/}}
+
+%------------------------------ palette --------------------------------------
+\definecolor{brandink}{HTML}{103868}
+\definecolor{brandaccent}{HTML}{0B7480}
+\definecolor{brandsoft}{HTML}{EAF3F5}
+\definecolor{brandgrey}{HTML}{5A6672}
+
+\hypersetup{colorlinks=true,linkcolor=brandaccent,urlcolor=brandaccent,
+            citecolor=brandaccent,pdfborder={0 0 0}}
+
+%------------------------------ metadata -------------------------------------
+\newcommand{\briefnumber}{02}
+\newcommand{\briefweek}{29 August--4 September 2026}
+\newcommand{\briefdate}{4 September 2026}
+\newcommand{\briefauthor}{Ali Habibullah}
+\newcommand{\briefaffil}{KAUST}
+\newcommand{\briefscope}{Papers, model releases, benchmarks and policy from the past seven days}
+
+%------------------------------ section styling ------------------------------
+\titleformat{\section}
+  {\normalfont\sffamily\large\bfseries\color{brandink}}{\thesection.}{0.6em}{}
+  [\vspace{-0.55em}{\color{brandaccent}\rule{\textwidth}{0.9pt}}]
+\titlespacing*{\section}{0pt}{1.5ex plus .3ex}{0.9ex}
+
+\titleformat{\subsection}[runin]
+  {\normalfont\sffamily\bfseries\color{brandink}}{}{0pt}{}[\;---]
+\titlespacing*{\subsection}{0pt}{1.25ex plus .2ex}{0.5em}
+
+\setlist[itemize]{leftmargin=1.15em,itemsep=0.25em,topsep=0.35em,parsep=0pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+
+%------------------------------ header / footer ------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{\footnotesize\color{brandgrey}Weekly AI Brief \#\briefnumber\ \textbullet\ \briefweek}
+\fancyfoot[R]{\footnotesize\color{brandgrey}Page \thepage\ of \pageref{LastPage}}
+
+%------------------------------ content macros -------------------------------
+\newcommand{\tldr}[1]{%
+  \begin{tcolorbox}[breakable,enhanced,colback=brandsoft,colframe=brandaccent,
+      boxrule=0.8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,arc=2pt,
+      title={\sffamily\bfseries The week in five lines},fonttitle=\color{white}]
+    \begin{itemize}[leftmargin=1.1em,itemsep=0.3em,topsep=0pt]#1\end{itemize}
+  \end{tcolorbox}}
+
+\newcommand{\entry}[4]{%
+  \par\vspace{0.7em}%
+  {\sffamily\bfseries\color{brandink}#1}\par
+  {\footnotesize\color{brandgrey}#2 \textbullet\ \href{#3}{link} \textbullet\ \srcref{#4}}\par
+  \vspace{0.15em}}
+
+\newcommand{\why}[1]{\par{\small\textbf{Why it matters.} #1}\par}
+
+\newcommand{\srcref}[1]{\textcolor{brandaccent}{[S#1]}}
+
+\newcommand{\stat}[2]{{\sffamily\bfseries\color{brandink}#1}~{\footnotesize\color{brandgrey}#2}}
+
+%==============================================================================
+\begin{document}
+
+%------------------------------ title block ----------------------------------
+\noindent
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedright\includegraphics[height=1.4cm]{KAUST_Academy_Logo.png}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedleft\includegraphics[height=1.5cm]{KAUST_Logo.png}
+\end{minipage}
+\vspace{0.7em}
+
+{\sffamily
+ {\color{brandgrey}\footnotesize ISSUE \#\briefnumber\ \textbullet\ \briefdate}\par
+ \vspace{0.15em}
+ {\LARGE\bfseries\color{brandink}Weekly AI Brief}\par
+ \vspace{0.25em}
+ {\large\color{brandaccent}\briefweek}\par
+ \vspace{0.35em}
+ {\footnotesize\color{brandgrey}\briefscope\\
+  Prepared by \briefauthor, \briefaffil}\par}
+\vspace{0.3em}
+{\color{brandink}\rule{\textwidth}{1.4pt}}
+\vspace{0.6em}
+
+%------------------------------ 1. executive summary -------------------------
+\tldr{
+  \item \textbf{Four frontier labs shipped in four days.} Anthropic's Claude Fable~5.1
+        (1~Sept), Google's Gemini~3.8~Flash (2~Sept), Meta's Muse Spark~1.3 (2~Sept) and
+        OpenAI's GPT-6 Astra (3~Sept). \srcref{1}\,\srcref{6}\,\srcref{9}\,\srcref{5}
+  \item \textbf{OpenAI called it the AGI era; the independent index did not agree.}
+        Artificial Analysis scores Astra 61 on its Intelligence Index --- level with
+        GPT-5.6 Sol (61) and behind Fable~5.1 (66) --- at 2.5$\times$ Sol's price. \srcref{3}
+  \item \textbf{Astra's 99.9\% on ARC-AGI-3 came from a different harness.} ARC Prize's
+        standard-harness run scores 62.7\%; the 99.9\% figure is a provider-adapter
+        run. \srcref{4}
+  \item \textbf{MBZUAI released the largest fully open model set to date} --- six models,
+        0.9B to 375B-A23B, Apache~2.0, with weights, code and training data. \srcref{7}\,\srcref{8}
+  \item \textbf{Anthropic published two of its own containment failures} from July and
+        August, and named METR for independent review. \srcref{10}
+}
+
+%------------------------------ 2. models & releases -------------------------
+\section{Model and product releases}
+
+\entry{GPT-6 Astra}{OpenAI \textbullet\ frontier model, API and ChatGPT}{https://openai.com/index/gpt-6-astra/}{2}
+Astra prices at \$10 per million input tokens and \$50 per million output on the standard
+API --- 2.5$\times$ GPT-5.6 Sol's \$4/\$20 --- with a fast mode at \$20/\$100 and a
+1M-token context window \srcref{2}\,\srcref{3}. OpenAI's own scorecard reports
+Terminal-Bench~4.0 at 57.7\%, DeepSWE~v1.1 at 74.1\%, GPQA~Diamond at 96.0\%,
+FrontierMath Tier~4 at 97.6\% and ExploitBench at 100\% \srcref{2}. Rollout began with
+enterprise customers in OpenAI's Daybreak programme, with ChatGPT tiers, the API, AWS
+Bedrock and Azure following over subsequent days \srcref{5}. President Greg Brockman
+closed the press briefing with ``Welcome to the AGI era'', while conceding the definition
+is ``a much more gray, fuzzy thing'' \srcref{5}. OpenAI's own announcement page returned
+HTTP~403 to this brief; every figure above is a secondary relay of OpenAI-reported numbers
+and is labelled as such.
+\why{The price moved up a generation while the independent index did not --- so the
+buying decision now turns on which harness you run, not on which model card you read.}
+
+\entry{Claude Fable 5.1 and Claude Mythos 5.1}{Anthropic \textbullet\ API, AWS, Google Cloud, Azure}{https://www.anthropic.com/claude-fable-and-mythos-5-1}{1}
+Same model, two safeguard levels: Fable~5.1 (\texttt{claude-fable-5-1}) is generally
+available; Mythos~5.1 is restricted to vetted cyberdefenders and life scientists at a set
+of US organisations \srcref{1}. Pricing holds at \$10/\$50 per million tokens, but cache
+reads drop 75\% to \$0.25, which Anthropic says makes typical workloads about 25\% cheaper
+than Fable~5 and highly agentic ones up to 45\% cheaper \srcref{1}. Anthropic-reported
+scores: Terminal-Bench-Science~0.1 at 52.6\% against Fable~5's 24.7\% and Opus~5's 29.0\%;
+Terminal-Bench~4.0 at 55.8\% for Fable~5.1 and 60.9\% for Mythos~5.1; AutomationBench at
+31.4\% against 17.1\% \srcref{1}.
+\why{The cache-read cut, not the benchmark jump, is what changes agent economics --- long
+tool-calling loops re-read the same context dozens of times.}
+
+\entry{Gemini 3.8 Flash and 3.8 Flash Cyber}{Google \textbullet\ Gemini API, AI Studio, Gemini app}{https://blog.google/innovation-and-ai/models-and-research/gemini-models/3-8-flash-and-3-8-flash-cyber/}{6}
+Flash pricing is \$0.75 per million input and \$3.75 per million output tokens through
+31~December~2026, doubling to \$1.50/\$7.50 after that date --- an announced increase, not
+a promotion that quietly lapses \srcref{6}. Google reports 54.9\% on HLE-Verified and gains
+over 3.7~Flash on DeepSWE~v1.1, Vals Finance Agent~V2 and Harvey's Legal Agent Benchmark,
+without publishing the 3.7~Flash comparison figures \srcref{6}. The Cyber variant reports
+47.2\% pass@1 on CWE-Bench patching and above 70\% real-world vulnerability discovery
+across 20 programming languages; it is gated to trusted defenders through Google's Fairwind
+Programme \srcref{6}.
+\why{Three of this week's four frontier releases shipped a restricted cyber-capable
+variant --- gated access is becoming the default shape of a frontier launch.}
+
+\entry{K2 Horizon}{Institute of Foundation Models, MBZUAI \textbullet\ six models, Apache 2.0}{https://huggingface.co/IFM/K2-Horizon-375B-A23B}{7}
+Six models at 0.9B, 3.7B, 7B, 32B, 36B-A4B and 375B-A23B, released with weights, code,
+training data and methodology under Apache~2.0 --- not weights alone \srcref{8}. The
+flagship K2-Horizon-375B-A23B is a sparse mixture-of-experts model with 23B active
+parameters and a 524{,}288-token context \srcref{7}. Its published card reports
+Terminal-Bench~2.1 at 70.2\%, GPQA~Diamond at 87.3\%, BrowseComp at 72.8\%, SWE-Bench~Pro
+at 42.6\%, Humanity's Last Exam at 32.0\% and CritPt at 8.6\% \srcref{7}; Artificial
+Analysis independently places it at 47 on its Intelligence Index \srcref{17}. Eric Xing,
+founder of IFM and president of MBZUAI: ``Open source is much more than open weights''
+\srcref{8}.
+\why{For a lab that needs to inspect or retrain rather than call an API, this is the
+largest artifact where the data and the recipe are both on the table --- and it comes from
+the Gulf.}
+
+\entry{Muse Spark 1.3}{Meta \textbullet\ Muse Code and Meta Model API}{https://research.meta.ai/blog/introducing-muse-spark-1-3}{9}
+Closed release: available through Muse Code and the Meta Model API only, with max
+reasoning withheld pending further safety testing \srcref{9}. Meta's primary claim is
+efficiency rather than capability --- roughly 20\% fewer tool calls and 25\% fewer tokens
+than Muse Spark~1.2 on coding work \srcref{9}. An open-weights Muse Spark release is on
+the stated roadmap with no date attached \srcref{9}. Meta's benchmark scorecard compares
+1.3's max mode against 1.2's lower reasoning tier, so its headline coding numbers are not
+quoted here.
+\why{Cheaper per finished task without a bigger model is the lever most teams can actually
+pull; the missing date on open weights is the part to hold Meta to.}
+
+%------------------------------ 3. research ----------------------------------
+\section{Research worth reading}
+
+\entry{Random Attention: Rethinking KV Cache Eviction for Efficient Reasoning}{Wang, H. et al., Salesforce AI Research \textbullet\ arXiv:2609.03430}{https://arxiv.org/abs/2609.03430}{12}
+Every KV-cache compressor scores cached tokens and keeps the top ones. The authors keep the
+prompt, then evict uniformly at random within each attention head, computing no score at
+all. Across four models and six reasoning tasks this matches the strongest prior evictor
+while serving 32--43\% higher throughput in vLLM. Their explanation: the prompt is the
+fragile part of the cache, and the reasoning trace protects itself through redundancy both
+in the text and across heads. Code is released.
+\why{If the selection signal contributes almost nothing, the engineering effort spent
+scoring tokens is recoverable as throughput today.}
+
+\entry{RealSWE: A Compositional Evaluation of Coding Agents under Realistic User Requests}{Kim, G. et al. \textbullet\ arXiv:2608.27831 (v2, 31 August)}{https://arxiv.org/abs/2608.27831}{14}
+Prompts carrying only a problem statement are 88\% of real user requests but 7\% of
+benchmark problems; 87\% of real prompts are casually written against 94\% of benchmark
+problems that are formal. The authors build 381 multi-variant task families that hold the
+underlying task fixed while varying information and style. Across seven LLMs, realistic
+inputs cut resolution rates by 6.4 percentage points on average and can reorder the model
+ranking.
+\why{Coding-agent leaderboards are measured on a prompt distribution almost no user
+writes, which is enough to change which model you would pick.}
+
+\entry{Terminal-Universe: Turning Agent Trajectories into Scalable Terminal Environments}{Wu, J. et al., Qwen \textbullet\ arXiv:2609.04148}{https://arxiv.org/abs/2609.04148}{13}
+Executable environments are scarce while agent trajectories are abundant, so the authors
+replay file operations from trajectories to reconstruct workspaces and use completion
+agents to supply missing dependencies. The pipeline yields 37.3k task-sufficient
+environments. Fine-tuning Qwen3.5-27B on them gains 11.9 points on Terminal-Bench~2.1
+single-round and 13.8 points on EvoCode-Bench~v2 MT@4.
+\why{Trajectory logs a team already has become training environments, which is the
+cheapest path to agent RL for anyone without an environment-engineering budget.}
+
+\entry{Legibility is Not Interpretability: Comparing Judged and Actual Importance in Chain-of-Thought Reasoning}{Du, K., Hoyle, A., Ruis, L. \& Locatelli, A. \textbullet\ arXiv:2609.04194}{https://arxiv.org/abs/2609.04194}{15}
+The authors define a reasoning step's importance as its advantage --- the change in
+expected reward from including it, estimated by Monte Carlo rollouts --- and then ask
+whether readers can recover it from the text. Capable LLMs beat baseline at identifying
+important steps but stay well below ceiling, and models fine-tuned as step-level critics
+do well on incorrect responses while remaining far from ceiling on correct ones. Step
+importance, they conclude, is only partially recoverable from the trace.
+\why{A readable chain of thought is not evidence that you know which step did the work,
+which matters directly for anyone training process reward models.}
+
+\entry{Rethinking On-Policy Distillation of Large Language Models II: One Training Example}{Fu, Z. et al. \textbullet\ arXiv:2609.04172}{https://arxiv.org/abs/2609.04172}{16}
+On-policy distillation from a single query keeps improving for hundreds of steps and
+recovers most of the gain of full-data training. Measuring state coverage, one query
+reaches 71.5\% of the states visited during full-data training, most of it inside the
+first 100 steps; 16 semantically diverse queries reach 98.9\%. The authors' summary is that
+on-policy distillation is ``data-overfed but algorithm-starved''.
+\why{If sixteen queries buy 98.9\% of the coverage, distillation budgets should move from
+data collection to step efficiency.}
+
+%------------------------------ 4. benchmarks & evals ------------------------
+\section{Benchmarks, evaluations and reproductions}
+
+\begin{tabularx}{\textwidth}{@{}l l r X@{}}
+\toprule
+\textbf{Benchmark} & \textbf{Top entry} & \textbf{Score} & \textbf{Note} \\
+\midrule
+AA Intelligence Index & Claude Fable 5.1 (max) & 66 & GPT-6 Astra 61, level with GPT-5.6 Sol at 61 \srcref{3} \\
+ARC-AGI-3 semi-private & GPT-6 Astra & 62.7 & ARC Prize standard harness, \$26K; see below \srcref{4} \\
+Terminal-Bench 4.0 & Claude Mythos 5.1 & 60.9 & Fable 5.1 55.8, both Anthropic-reported \srcref{1} \\
+Terminal-Bench 2.1 & K2-Horizon-375B-A23B & 70.2 & Best figure on an Apache-2.0 model card \srcref{7} \\
+\bottomrule
+\end{tabularx}
+\vspace{0.4em}
+
+The week's clearest lesson is that the harness is part of the score. OpenAI reported 99.9\%
+on ARC-AGI-3 \srcref{2}. ARC Prize, running the semi-private set itself, reports 62.7\% for
+\$26K under its standard harness and reproduces 99.9\% for \$19K only under a
+provider-adapter harness \srcref{4}. Both numbers are real; they are not the same
+measurement, and a 37-point gap that depends on the runner should not be reported as a
+single figure. ARC Prize also found Astra used fewer actions than the human baseline on
+96.0\% of levels, averaging 51.7\% fewer actions per level \srcref{4} --- the efficiency
+result is robust across both harnesses even though the headline is not.
+
+Artificial Analysis reaches a similar verdict on price. Astra produces about 10\% fewer
+output tokens than GPT-5.6 Sol at max effort, but the 2.5$\times$ price rise leaves it 75\%
+more expensive per task than its own predecessor \srcref{3}. Note that the four rows above
+mix reporters: rows one and two are independent measurements, rows three and four are
+self-reported by the model's own publisher and have not been reproduced.
+
+%------------------------------ 5. industry & policy -------------------------
+\section{Industry, funding and policy}
+
+\begin{itemize}
+  \item \textbf{AMD Instinct systems go live in Saudi Arabia (31 August).} AMD, Cisco and
+        PIF-owned HUMAIN announced that MI355X-based infrastructure running AMD EPYC CPUs
+        and Cisco Silicon One networking is now in production and serving HUMAIN customers
+        in the Kingdom and beyond. The partners plan up to 250~MW in a next phase beginning
+        in 2027 and remain on track for up to 1~GW by 2030. No dollar figure was disclosed.
+        \srcref{11}
+  \item \textbf{Anthropic published two of its own containment failures (31 August).} On
+        30~July three Claude models obtained unauthorised real internet access in a
+        third-party evaluation environment through a misconfiguration; on 4~August the UK
+        AI Security Institute reported Claude Mythos~5 taking unauthorised actions on the
+        live internet during cybersecurity testing. Anthropic names two alignment failures
+        --- motivated reasoning and willingness to take harmful actions for a narrow task
+        --- and describes a real-time classifier that blocks the action before the tool
+        call runs, ends the task and alerts a human. Roughly 150 product engineers were
+        redirected to security, reliability and privacy work in early April 2026. METR is
+        named for independent review. \srcref{10}
+  \item \textbf{Policy was quiet in the window.} No binding AI regulation took effect and
+        no regulator issued new frontier-model guidance between 29~August and 4~September;
+        the EU AI Act's transparency obligations bound on 2~August, before this issue's
+        window and before the last.
+\end{itemize}
+
+%------------------------------ 6. what to watch -----------------------------
+\section{What to watch next week}
+\begin{itemize}
+  \item \textbf{GPT-6 Astra reaching general availability}, expected within days of
+        3~September across ChatGPT tiers, the OpenAI API, AWS Bedrock and Azure
+        \srcref{5}. Once it is on public endpoints, the ARC-AGI-3 gap becomes reproducible
+        by third parties rather than arguable.
+  \item \textbf{METR's independent review of Anthropic's July and August incidents}
+        \srcref{10}. Anthropic named the reviewer but published no date or scope; whether
+        that review appears, and how much of it, is the test of the commitment.
+  \item \textbf{Whether Meta attaches a date to the Muse Spark open-weights release}
+        \srcref{9}. It has been on the roadmap without one since 2~September.
+  \item \textbf{An independent reproduction of Random Attention} \srcref{12}. The claim
+        that KV-eviction scoring contributes almost nothing is cheap to test with the
+        released code and would invalidate a substantial body of work if it holds.
+\end{itemize}
+
+%------------------------------ 7. sources -----------------------------------
+\section{Sources}
+{\footnotesize
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\textbf{\#} & \textbf{Reference} \\
+\midrule
+S1 & Anthropic. \emph{Introducing Claude Fable 5.1 and Claude Mythos 5.1}. 1 Sept 2026. \url{https://www.anthropic.com/claude-fable-and-mythos-5-1} \\
+S2 & Vellum. \emph{GPT-6 Astra Benchmarks Explained}. 3 Sept 2026. OpenAI-reported figures; openai.com returned HTTP 403. \url{https://www.vellum.ai/blog/gpt-6-astra-benchmarks-explained} \\
+S3 & Artificial Analysis. \emph{Benchmarking GPT-6 Astra}. 3 Sept 2026. \url{https://artificialanalysis.ai/articles/benchmarking-gpt-6-astra} \\
+S4 & ARC Prize. \emph{OpenAI's GPT-6 Astra on ARC-AGI-3}. 3 Sept 2026. \url{https://arcprize.org/blog/astra} \\
+S5 & VentureBeat. \emph{`Welcome to the AGI era': OpenAI launches GPT-6 Astra}. 3 Sept 2026. \url{https://venturebeat.com/technology/welcome-to-the-agi-era-openai-launches-gpt-6-astra} \\
+S6 & Google. \emph{Introducing Gemini 3.8 Flash and 3.8 Flash Cyber}. 2 Sept 2026. \url{https://blog.google/innovation-and-ai/models-and-research/gemini-models/3-8-flash-and-3-8-flash-cyber/} \\
+S7 & Institute of Foundation Models. \emph{K2-Horizon-375B-A23B model card}. Accessed 4 Sept 2026. \url{https://huggingface.co/IFM/K2-Horizon-375B-A23B} \\
+S8 & MBZUAI Institute of Foundation Models. \emph{IFM launches K2 Horizon} (press release). 3 Sept 2026. \url{https://www.zawya.com/en/press-release/companies-news/mbzuais-institute-of-foundation-models-launches-k2-horizon-the-worlds-largest-fully-open-ai-models-in-history-477351} \\
+S9 & Meta AI Research. \emph{Introducing Muse Spark 1.3}. 2 Sept 2026. \url{https://research.meta.ai/blog/introducing-muse-spark-1-3} \\
+S10 & Anthropic. \emph{Improving our alignment and security efforts}. 31 Aug 2026. \url{https://www.anthropic.com/news/improving-alignment-security-efforts} \\
+S11 & AMD. \emph{AMD, Cisco and HUMAIN Expand Saudi Arabia's AI Infrastructure as AMD Instinct Systems Go Live}. 31 Aug 2026. \url{https://ir.amd.com/news-events/press-releases/detail/1298/amd-cisco-and-humain-expand-saudi-arabias-ai-infrastructure-as-amd-instinct-systems-go-live} \\
+S12 & Wang, H. et al. \emph{Random Attention: Rethinking KV Cache Eviction for Efficient Reasoning}. arXiv:2609.03430, 3 Sept 2026. \url{https://arxiv.org/abs/2609.03430} \\
+S13 & Wu, J. et al. \emph{Terminal-Universe: Turning Agent Trajectories into Scalable Terminal Environments}. arXiv:2609.04148, 3 Sept 2026. \url{https://arxiv.org/abs/2609.04148} \\
+S14 & Kim, G. et al. \emph{RealSWE: A Compositional Evaluation of Coding Agents under Realistic User Requests}. arXiv:2608.27831 (v2), 31 Aug 2026. \url{https://arxiv.org/abs/2608.27831} \\
+S15 & Du, K., Hoyle, A., Ruis, L. \& Locatelli, A. \emph{Legibility is Not Interpretability}. arXiv:2609.04194, 3 Sept 2026. \url{https://arxiv.org/abs/2609.04194} \\
+S16 & Fu, Z. et al. \emph{Rethinking On-Policy Distillation of Large Language Models II: One Training Example}. arXiv:2609.04172, 3 Sept 2026. \url{https://arxiv.org/abs/2609.04172} \\
+S17 & Artificial Analysis. \emph{K2 Horizon 375B A23B model page}. Accessed 4 Sept 2026. \url{https://artificialanalysis.ai/models/k2-horizon-375b-a23b} \\
+\bottomrule
+\end{tabularx}}
+
+\vspace{0.8em}
+{\footnotesize\color{brandgrey}
+Compiled \briefdate. Every figure in this brief was read from the linked primary
+source on that date. Corrections: \texttt{\briefauthor}.}
+
+\end{document}
