@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
-# Install (or refresh) the Tuesday 15:00 crontab entry for the Weekly AI Brief.
-# Idempotent: re-running replaces the existing line rather than adding a second.
+# Install (or refresh) the crontab entries for the Weekly AI Brief.
+# Idempotent: re-running replaces the existing lines rather than adding more.
+#
+# Three entries, all tagged with the same marker so --remove takes them all:
+#
+#   09:00 daily      keep the Claude login warm, and alert if it has died. A dead
+#                    login can only be fixed by a human signing in, so the warning
+#                    has to arrive with days to spare, not at build time.
+#   14:45 Tuesday    one more refresh so the build starts on a minutes-old token.
+#   15:00 Tuesday    build, mail, and publish the issue.
 #
 # Run this ON A LOGIN NODE (glogin*), not a compute node -- the cron spool is
 # node-local, so an entry installed on a compute node disappears with the job.
@@ -12,7 +20,14 @@ set -euo pipefail
 
 ROOT="/ibex/user/habiam0b/Weekly_AI_Reports"
 MARKER="# weekly-ai-brief"
-LINE="0 15 * * 2 /usr/bin/env bash $ROOT/scripts/run_weekly.sh >> $ROOT/logs/cron.log 2>&1 $MARKER"
+RUN="/usr/bin/env bash $ROOT/scripts/run_weekly.sh >> $ROOT/logs/cron.log 2>&1"
+KEEP="/usr/bin/env bash $ROOT/scripts/auth_keepalive.sh >> $ROOT/logs/cron.log 2>&1"
+
+LINES=(
+  "0 9 * * *  $KEEP $MARKER"
+  "45 14 * * 2 $KEEP $MARKER"
+  "0 15 * * 2 $RUN $MARKER"
+)
 
 case "$(hostname)" in
   glogin*|login*) : ;;
@@ -32,9 +47,10 @@ if [[ "${1:-}" == "--remove" ]]; then
   exit 0
 fi
 
-{ printf '%s\n' "$cleaned" | grep -v '^$' || true; printf '%s\n' "$LINE"; } | crontab -
+{ printf '%s\n' "$cleaned" | grep -v '^$' || true; printf '%s\n' "${LINES[@]}"; } | crontab -
 echo "installed on $(hostname):"
 crontab -l | grep -F "$MARKER"
 echo
 echo "Next: confirm the pipeline works unattended before Tuesday --"
+echo "  bash $ROOT/scripts/check_auth.sh          # is the login usable?"
 echo "  DRY_RUN=1 bash $ROOT/scripts/run_weekly.sh"
