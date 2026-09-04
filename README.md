@@ -29,6 +29,7 @@ Weekly_AI_Reports/
 │   ├── install_skill.sh            copies skill/ into ~/.claude/skills/
 │   ├── build_report.py             tex → pdf, enforces the 3–5 page budget
 │   ├── check_sources.py            srcref ↔ SOURCES.md correspondence check
+│   ├── fetch_openai.py             reads openai.com, which blocks the fetch tool
 │   ├── submit_weekly.sh            queues the Slurm job (cron target)
 │   ├── weekly_job.sbatch           the job: runs the brief on a compute node
 │   ├── run_weekly.sh               unattended end-to-end run (what the job runs)
