@@ -4,8 +4,8 @@
 Credentials are read from the environment, falling back to a .env file in
 Weekly_AI_Reports/ (see .env.example). Nothing is hardcoded here.
 
-    python3 scripts/send_report.py --pdf 2026-08-25/report.pdf --dry-run
-    python3 scripts/send_report.py --pdf 2026-08-25/report.pdf
+    python3 scripts/send_report.py --pdf 2026/08/25/report.pdf --dry-run
+    python3 scripts/send_report.py --pdf 2026/08/25/report.pdf
 """
 from __future__ import annotations
 
@@ -60,6 +60,15 @@ def read_recipients(csv_path: Path) -> list[tuple[str, str]]:
     if not people:
         sys.exit(f"error: no recipients in {csv_path}")
     return people
+
+
+def issue_stamp(pdf: Path) -> str:
+    """Date of the issue this PDF belongs to, from its path: 2026/09/04 -> 2026-09-04."""
+    parts = pdf.resolve().parts
+    y, m, d = parts[-4:-1] if len(parts) >= 4 else ("", "", "")
+    if len(y) == 4 and y.isdigit() and len(m) == 2 and m.isdigit() and len(d) == 2 and d.isdigit():
+        return f"{y}-{m}-{d}"
+    return pdf.parent.name          # a PDF kept somewhere else still gets a label
 
 
 def default_body(name: str, week: str) -> str:
@@ -121,7 +130,7 @@ def main() -> int:
         sys.exit("error: set WEEKLY_AI_SMTP_USER and WEEKLY_AI_SMTP_PASS "
                  f"(env or {REPORT_ROOT / '.env'})")
 
-    week = args.week or pdf.parent.name
+    week = args.week or issue_stamp(pdf)
     subject = args.subject or f"Weekly AI Brief - {week}"
     override_body = args.body_file.read_text(encoding="utf-8") if args.body_file else None
     people = read_recipients(args.csv)

@@ -23,11 +23,11 @@ REASON=""
 # A dry run must not append to the live issue's log -- that log is the audit record of
 # what was actually built and mailed, and interleaving a rehearsal into it corrupts it.
 if [[ "${DRY_RUN:-0}" == "1" ]]; then
-  OUTDIR="$ROOT/.dryrun-$STAMP"      # never touches a real issue folder
+  OUTDIR="$ROOT/.dryrun/$(issue_dir "$STAMP")"   # never touches a real issue folder
   LOG="$LOGDIR/dryrun-$STAMP.log"
   SEND_CLAUSE="Do NOT send any email; stop after building the PDF and writing SOURCES.md."
 else
-  OUTDIR="$ROOT/$STAMP"
+  OUTDIR="$ROOT/$(issue_dir "$STAMP")"
   LOG="$LOGDIR/run-$STAMP.log"
   SEND_CLAUSE="Then send it to everyone in List_Of_People_To_Send_To.csv without asking for confirmation -- this is the scheduled unattended run."
 fi

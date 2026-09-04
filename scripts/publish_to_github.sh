@@ -12,7 +12,7 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 STAMP="${1:-$(date +%F)}"
 HEALTH="${2:-ok}"
-OUTDIR="$ROOT/$STAMP"
+OUTDIR="$ROOT/$(issue_dir "$STAMP")"
 BRANCH="main"
 
 cd "$ROOT" || exit 1
@@ -63,7 +63,7 @@ if [[ ! -d "$OUTDIR" ]]; then
   exit 1
 fi
 
-git add -- "$STAMP" || exit 1
+git add -- "$(issue_dir "$STAMP")" || exit 1
 
 # `grep -c` prints 0 AND exits 1 when nothing matches, so an `|| echo` fallback inside
 # the substitution appends a SECOND line and the arithmetic below dies on "0\n1".

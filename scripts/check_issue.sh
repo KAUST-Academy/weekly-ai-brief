@@ -15,9 +15,10 @@ source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 MAX_AGE_DAYS="${MAX_AGE_DAYS:-8}"   # a week plus a day of slack
 
 newest=""
-for d in "$ROOT"/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]; do
+for d in "$ROOT"/[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]; do
   [[ -f "$d/report.pdf" ]] || continue
-  stamp=$(basename "$d")
+  # .../2026/09/04 -> 2026-09-04
+  stamp="$(basename "$(dirname "$(dirname "$d")")")-$(basename "$(dirname "$d")")-$(basename "$d")"
   [[ -z "$newest" || "$stamp" > "$newest" ]] && newest="$stamp"
 done
 

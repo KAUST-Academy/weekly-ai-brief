@@ -39,3 +39,7 @@ for _wa_c in "${WEEKLY_AI_CONDA_BIN:-}" \
 done
 unset _wa_c
 export PATH
+
+# Where one issue lives, relative to ROOT: 2026-09-04 -> 2026/09/04
+# Every script goes through this, so the layout is defined in exactly one place.
+issue_dir() { printf '%s/%s/%s' "${1:0:4}" "${1:5:2}" "${1:8:2}"; }

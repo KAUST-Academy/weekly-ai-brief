@@ -10,9 +10,10 @@ List_Of_People_To_Send_To.csv
 
 # Dry runs are scratch output, never an issue.
 .dryrun-*/
+.dryrun/
 
 # Tectonic's build log -- machine noise, regenerable from the committed report.tex.
-*/report.log
+report.log
 
 # Run logs are the verbatim transcript of an agent that reads .env and the recipient
 # CSV during the same run, so they can quote either. They stay on the machine.
