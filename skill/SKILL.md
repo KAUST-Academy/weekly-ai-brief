@@ -22,7 +22,7 @@ Weekly_AI_Reports/
   scripts/check_sources.py        srcref <-> SOURCES.md correspondence, both ways
   scripts/send_report.py          CSV -> personalised mail with the PDF attached
   scripts/run_weekly.sh           unattended end-to-end run (the Tuesday cron target)
-  YYYY-MM-DD/                     one folder per issue: report.tex, report.pdf, SOURCES.md
+  YYYY/MM/DD/                     one folder per issue: report.tex, report.pdf, SOURCES.md
 ```
 
 LaTeX engine: `~/bin/tectonic` (self-contained, no root). `build_report.py` finds it.
@@ -34,10 +34,12 @@ LaTeX engine: `~/bin/tectonic` (self-contained, no root). `build_report.py` find
 1. Get today's real date (`date +%F`) -- never assume it. The window is the **seven days
    ending today**, inclusive. Write both endpoints down; every inclusion decision is
    measured against them.
-2. Read the previous issue's `SOURCES.md` (highest-numbered dated folder, if any). Anything
+2. Read the previous issue's `SOURCES.md` (the latest `YYYY/MM/DD/`, if any). Anything
    already covered is not news again -- only a genuine follow-up (a reproduction, a
    retraction, a released weight set) earns a second appearance, and it must say what changed.
-3. Create `Weekly_AI_Reports/<today>/` and work inside it.
+3. Create the issue folder and work inside it. Issues are filed by year and month:
+   an issue dated 2026-09-04 lives at `2026/09/04/`. Below, `<issue>` means that path.
+   The unattended run passes you the absolute path, so use whatever it gives you.
 
 ## Phase 1 — Harvest
 
@@ -90,7 +92,7 @@ delete the section -- a thin section is worse than an absent one.
 
 ## Phase 3 — Write
 
-Copy `template/report_template.tex` to `<today>/report.tex` and replace every block marked
+Copy `template/report_template.tex` to `<issue>/report.tex` and replace every block marked
 `% >>> REPLACE`. Fill the six metadata fields first. **The issue number identifies the window,
 not the run:** it is one more than the highest `\briefnumber` in the existing dated folders,
 except when you are rebuilding a window that already has a folder -- then keep the number that
@@ -119,7 +121,7 @@ The standard the prose has to meet:
 ## Phase 4 — Build and look at it
 
 ```bash
-python3 scripts/build_report.py <today>     # from the repo root
+python3 scripts/build_report.py <issue>     # from the repo root
 ```
 
 It fails loudly on a LaTeX error and exits 2 if the PDF is outside 3-5 pages. Over budget:
@@ -128,7 +130,7 @@ cut the weakest item, not the sources section. Under: the research section is to
 Then **actually look at the output** -- render page 1 and read it:
 
 ```bash
-python3 -c "import fitz;d=fitz.open('<today>/report.pdf');[p.get_pixmap(dpi=110).save(f'/tmp/p{i+1}.png') for i,p in enumerate(d)]"
+python3 -c "import fitz;d=fitz.open('<issue>/report.pdf');[p.get_pixmap(dpi=110).save(f'/tmp/p{i+1}.png') for i,p in enumerate(d)]"
 ```
 
 Check: no overfull lines running into the margin, no orphaned headings at a page foot, no
@@ -136,7 +138,7 @@ placeholder text survived, the table fits its column widths.
 
 ## Phase 5 — SOURCES.md
 
-Write `<today>/SOURCES.md` from `template/SOURCES_template.md`. It has three parts:
+Write `<issue>/SOURCES.md` from `template/SOURCES_template.md`. It has three parts:
 
 1. **Cited sources** -- numbered S1..Sn, matching `\srcref{}` in the report one-for-one.
    Each row: title, publisher/org, type (paper / lab blog / leaderboard / press / filing),
@@ -149,7 +151,7 @@ Write `<today>/SOURCES.md` from `template/SOURCES_template.md`. It has three par
 Then verify the correspondence both ways -- this is mechanical, so let the script do it:
 
 ```bash
-python3 scripts/check_sources.py <today>
+python3 scripts/check_sources.py <issue>
 ```
 
 It exits 2 on a dangling `\srcref` (a claim that lost its evidence during editing), on a
@@ -159,8 +161,8 @@ template placeholder text.
 ## Phase 6 — Send
 
 ```bash
-python3 scripts/send_report.py --pdf <today>/report.pdf --week "<18--25 August 2026>" --dry-run
-python3 scripts/send_report.py --pdf <today>/report.pdf --week "<18--25 August 2026>"
+python3 scripts/send_report.py --pdf <issue>/report.pdf --week "<18--25 August 2026>" --dry-run
+python3 scripts/send_report.py --pdf <issue>/report.pdf --week "<18--25 August 2026>"
 ```
 
 Each recipient gets their own message with a first-name greeting and the PDF attached.
@@ -174,7 +176,7 @@ Each recipient gets their own message with a first-name greeting and the PDF att
 - [ ] Every number, ID and date was read from a primary source you fetched this run
 - [ ] Nothing is outside the seven-day window without a sentence saying why it is here
 - [ ] No `% >>> REPLACE`, no "Headline one", no template placeholder anywhere in the PDF
-- [ ] `python3 scripts/check_sources.py <today>` passes
+- [ ] `python3 scripts/check_sources.py <issue>` passes
 - [ ] PDF is 3-5 pages and page 1 was rendered and read
 - [ ] No claim stated more confidently than its evidence supports
 - [ ] Recipient list read from `Weekly_AI_Reports/List_Of_People_To_Send_To.csv`

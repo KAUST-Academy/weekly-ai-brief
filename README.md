@@ -41,10 +41,11 @@ Weekly_AI_Reports/
 │   ├── publish_to_github.sh        commits the issue and pushes it
 │   └── send_report.py              CSV → personalised mail with the PDF attached
 ├── logs/                           run transcripts — local only, never pushed
-└── YYYY-MM-DD/                     one folder per issue
-    ├── report.tex
-    ├── report.pdf
-    └── SOURCES.md                  every source cited, plus what was rejected and why
+└── YYYY/MM/DD/                     issues, filed by year and month
+    └── 2026/09/04/                 the issue dated 4 September 2026
+        ├── report.tex
+        ├── report.pdf
+        └── SOURCES.md              every source cited, plus what was rejected and why
 ```
 
 ## One-time setup
@@ -60,9 +61,9 @@ Page counting needs `pymupdf` (already installed).
 ## Running an issue by hand
 
 ```bash
-python3 scripts/build_report.py 2026-08-25                        # build + page check
-python3 scripts/send_report.py --pdf 2026-08-25/report.pdf --dry-run
-python3 scripts/send_report.py --pdf 2026-08-25/report.pdf        # actually send
+python3 scripts/build_report.py 2026/08/25                        # build + page check
+python3 scripts/send_report.py --pdf 2026/08/25/report.pdf --dry-run
+python3 scripts/send_report.py --pdf 2026/08/25/report.pdf        # actually send
 ```
 
 Each recipient receives their own message with a first-name greeting and the PDF attached —
@@ -105,10 +106,10 @@ DRY_RUN=1 bash scripts/run_weekly.sh   # rehearse directly (no Slurm, no mail)
 
 Four safeguards worth knowing about:
 
-- **A dated issue is never silently rebuilt.** If `<date>/report.pdf` exists the run exits 0
+- **A dated issue is never silently rebuilt.** If `YYYY/MM/DD/report.pdf` exists the run exits 0
   with `SKIP`, so a second cron fire or a manual re-run cannot re-send a delivered brief.
   `FORCE=1` overrides.
-- **Dry runs are isolated** into `.dryrun-<date>/` so testing never overwrites a real issue.
+- **Dry runs are isolated** into `.dryrun/YYYY/MM/DD/` so testing never overwrites a real issue.
 - **The login is checked before any work starts.** `check_auth.sh` runs first; if it fails the
   run stops immediately with a named cause and an alert, rather than burning a slot and
   leaving a bare "no PDF produced" in the log.
@@ -193,7 +194,7 @@ Dry runs suppress alerts — a rehearsal you are watching should not mail you.
 **The backstop.** Every alert above fires from *inside* a run. If the Slurm job never starts —
 queue backlog, node failure, a submission that vanished — nothing runs and nothing complains,
 and silence looks exactly like success. `check_issue.sh` runs Wednesday morning and checks for
-the artefact itself: if no `<date>/report.pdf` has appeared in the last 8 days, it says so.
+the artefact itself: if no `YYYY/MM/DD/report.pdf` has appeared in the last 8 days, it says so.
 
 ## Sending: SMTP relay and deliverability
 
