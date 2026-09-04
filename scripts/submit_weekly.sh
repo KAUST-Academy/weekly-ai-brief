@@ -9,9 +9,7 @@
 #   FORCE=1 bash scripts/submit_weekly.sh    # rebuild + resend an existing issue
 set -uo pipefail
 
-ROOT="/ibex/user/habiam0b/Weekly_AI_Reports"
-CONDA_BIN="/ibex/user/habiam0b/miniconda3/bin"
-export PATH="/opt/slurm/cluster/ibex/install-v2/RedHat-9/bin:$CONDA_BIN:$HOME/bin:$HOME/.local/bin:$PATH"
+source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 
 mkdir -p "$ROOT/logs"
 LOG="$ROOT/logs/submit.log"
@@ -27,7 +25,12 @@ if ! command -v sbatch >/dev/null 2>&1; then
   exit 1
 fi
 
-OUT=$(sbatch "$ROOT/scripts/weekly_job.sbatch" 2>&1)
+OUT=$(sbatch \
+        --partition="${WEEKLY_AI_PARTITION:-batch}" \
+        --output="$ROOT/logs/slurm-%j.out" \
+        --error="$ROOT/logs/slurm-%j.out" \
+        --export=ALL,WEEKLY_AI_ROOT="$ROOT" \
+        "$ROOT/scripts/weekly_job.sbatch" 2>&1)
 RC=$?
 
 if [[ $RC -ne 0 ]]; then

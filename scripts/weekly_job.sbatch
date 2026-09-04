@@ -10,15 +10,19 @@
 #
 # Cron still fires on the login node -- submitting a job is light. The job does the work.
 #
+# Submit it with scripts/submit_weekly.sh, which fills in the partition, the log
+# paths and WEEKLY_AI_ROOT. Those are the three things that cannot be written down
+# here without naming one cluster and one account.
+#
 #SBATCH --job-name=weekly-ai-brief
 #SBATCH --partition=batch
 #SBATCH --time=02:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --output=/ibex/user/habiam0b/Weekly_AI_Reports/logs/slurm-%j.out
-#SBATCH --error=/ibex/user/habiam0b/Weekly_AI_Reports/logs/slurm-%j.out
 
-ROOT="/ibex/user/habiam0b/Weekly_AI_Reports"
+# Slurm runs a copy of this file out of its spool directory, so the script cannot
+# find the repo from its own path the way every other script here does.
+ROOT="${WEEKLY_AI_ROOT:?set by scripts/submit_weekly.sh -- submit through that, not sbatch directly}"
 
 echo "=== slurm job ${SLURM_JOB_ID:-?} on $(hostname) at $(date -Is) ==="
 

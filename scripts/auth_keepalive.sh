@@ -13,10 +13,8 @@
 #   bash scripts/auth_keepalive.sh
 set -uo pipefail
 
-ROOT="/ibex/user/habiam0b/Weekly_AI_Reports"
-CONDA_BIN="/ibex/user/habiam0b/miniconda3/bin"
+source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 LOG="$ROOT/logs/auth.log"
-export PATH="$CONDA_BIN:$HOME/bin:$HOME/.local/bin:$PATH"
 
 mkdir -p "$ROOT/logs"
 
@@ -35,7 +33,7 @@ if [[ $RC -ne 0 ]]; then
     --message "The scheduled auth check failed, so the weekly run cannot start.
 
 Fix: SSH to the cron node and run 'claude' interactively, then sign in.
-  ssh login510-27
+  ssh $(hostname)
   claude
 
 This check runs daily, so the alert repeats until the login is renewed." \

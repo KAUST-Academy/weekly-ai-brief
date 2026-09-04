@@ -22,7 +22,7 @@
 #   crontab -l                            # verify
 set -euo pipefail
 
-ROOT="/ibex/user/habiam0b/Weekly_AI_Reports"
+source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 MARKER="# weekly-ai-brief"
 SUBMIT="/usr/bin/env bash $ROOT/scripts/submit_weekly.sh >> $ROOT/logs/cron.log 2>&1"
 KEEP="/usr/bin/env bash $ROOT/scripts/auth_keepalive.sh >> $ROOT/logs/cron.log 2>&1"

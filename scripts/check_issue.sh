@@ -10,9 +10,7 @@
 # Fires the morning after the scheduled build.
 set -uo pipefail
 
-ROOT="/ibex/user/habiam0b/Weekly_AI_Reports"
-CONDA_BIN="/ibex/user/habiam0b/miniconda3/bin"
-export PATH="$CONDA_BIN:$HOME/bin:$HOME/.local/bin:$PATH"
+source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 
 MAX_AGE_DAYS="${MAX_AGE_DAYS:-8}"   # a week plus a day of slack
 

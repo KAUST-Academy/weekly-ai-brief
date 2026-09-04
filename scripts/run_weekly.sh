@@ -11,16 +11,14 @@
 # Everything this script needs is put on PATH explicitly below.
 set -uo pipefail
 
-ROOT="/ibex/user/habiam0b/Weekly_AI_Reports"
-CONDA_BIN="/ibex/user/habiam0b/miniconda3/bin"
-CLAUDE="${CLAUDE_BIN:-$HOME/.local/bin/claude}"
+source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
+CLAUDE="${CLAUDE_BIN:-$(command -v claude || echo "$HOME/.local/bin/claude")}"
 LOGDIR="$ROOT/logs"
 STAMP="$(date +%F)"
 
 mkdir -p "$LOGDIR"
 HEALTH="ok"
 REASON=""
-export PATH="$CONDA_BIN:$HOME/bin:$HOME/.local/bin:$PATH"
 
 # A dry run must not append to the live issue's log -- that log is the audit record of
 # what was actually built and mailed, and interleaving a rehearsal into it corrupts it.

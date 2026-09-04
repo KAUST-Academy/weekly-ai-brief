@@ -9,13 +9,12 @@
 # already gone out by then -- a failure here means "retry the push", nothing more.
 set -uo pipefail
 
-ROOT="/ibex/user/habiam0b/Weekly_AI_Reports"
+source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 STAMP="${1:-$(date +%F)}"
 HEALTH="${2:-ok}"
 OUTDIR="$ROOT/$STAMP"
 BRANCH="main"
 
-export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 cd "$ROOT" || exit 1
 
 if [[ ! -d .git ]]; then
