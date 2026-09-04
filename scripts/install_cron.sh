@@ -2,13 +2,17 @@
 # Install (or refresh) the crontab entries for the Weekly AI Brief.
 # Idempotent: re-running replaces the existing lines rather than adding more.
 #
-# Three entries, all tagged with the same marker so --remove takes them all:
+# Four entries, all tagged with the same marker so --remove takes them all:
 #
 #   09:00 daily      keep the Claude login warm, and alert if it has died. A dead
 #                    login can only be fixed by a human signing in, so the warning
 #                    has to arrive with days to spare, not at build time.
 #   14:45 Tuesday    one more refresh so the build starts on a minutes-old token.
-#   15:00 Tuesday    build, mail, and publish the issue.
+#   15:00 Tuesday    submit the build to Slurm. The agent cannot run on a login node
+#                    -- it gets reaped (see weekly_job.sbatch) -- so cron only queues
+#                    the job and a compute node does the work.
+#   09:00 Wednesday  confirm an issue actually appeared. If the job never ran, no
+#                    other alert can fire, so this checks for the artefact itself.
 #
 # Run this ON A LOGIN NODE (glogin*), not a compute node -- the cron spool is
 # node-local, so an entry installed on a compute node disappears with the job.
@@ -20,13 +24,15 @@ set -euo pipefail
 
 ROOT="/ibex/user/habiam0b/Weekly_AI_Reports"
 MARKER="# weekly-ai-brief"
-RUN="/usr/bin/env bash $ROOT/scripts/run_weekly.sh >> $ROOT/logs/cron.log 2>&1"
+SUBMIT="/usr/bin/env bash $ROOT/scripts/submit_weekly.sh >> $ROOT/logs/cron.log 2>&1"
 KEEP="/usr/bin/env bash $ROOT/scripts/auth_keepalive.sh >> $ROOT/logs/cron.log 2>&1"
+VERIFY="/usr/bin/env bash $ROOT/scripts/check_issue.sh >> $ROOT/logs/cron.log 2>&1"
 
 LINES=(
   "0 9 * * *  $KEEP $MARKER"
   "45 14 * * 2 $KEEP $MARKER"
-  "0 15 * * 2 $RUN $MARKER"
+  "0 15 * * 2 $SUBMIT $MARKER"
+  "0 9 * * 3  $VERIFY $MARKER"
 )
 
 case "$(hostname)" in
@@ -53,4 +59,5 @@ crontab -l | grep -F "$MARKER"
 echo
 echo "Next: confirm the pipeline works unattended before Tuesday --"
 echo "  bash $ROOT/scripts/check_auth.sh          # is the login usable?"
-echo "  DRY_RUN=1 bash $ROOT/scripts/run_weekly.sh"
+echo "  bash $ROOT/scripts/submit_weekly.sh       # queue a real run now"
+echo "  squeue -u \$USER -n weekly-ai-brief        # watch it"
