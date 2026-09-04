@@ -25,7 +25,10 @@ Weekly_AI_Reports/
 │   ├── build_report.py             tex → pdf, enforces the 3–5 page budget
 │   ├── check_sources.py            srcref ↔ SOURCES.md correspondence check
 │   ├── run_weekly.sh               unattended end-to-end run (cron target)
-│   ├── install_cron.sh             installs the Tuesday 15:00 crontab entry
+│   ├── check_auth.sh               is the Claude login usable? (preflight)
+│   ├── auth_keepalive.sh           daily token refresh + early warning (cron target)
+│   ├── notify.py                   emails an operational alert when a run fails
+│   ├── install_cron.sh             installs all three crontab entries
 │   ├── publish_to_github.sh        commits the issue and pushes it
 │   └── send_report.py              CSV → personalised mail with the PDF attached
 ├── logs/                           run transcripts — local only, never pushed
@@ -67,10 +70,12 @@ bash /ibex/user/habiam0b/Weekly_AI_Reports/scripts/install_cron.sh   # idempoten
 crontab -l                                                          # verify
 ```
 
-That installs one line:
+That installs three lines:
 
 ```
-0 15 * * 2  /usr/bin/env bash .../scripts/run_weekly.sh >> .../logs/cron.log 2>&1
+0  9 * * *  .../scripts/auth_keepalive.sh    keep the login warm, warn early if it dies
+45 14 * * 2 .../scripts/auth_keepalive.sh    one more refresh, 15 min before the build
+0  15 * * 2 .../scripts/run_weekly.sh        build, mail, publish
 ```
 
 `run_weekly.sh` invokes `claude -p` against the `weekly-ai-report` skill, builds into a dated
@@ -83,18 +88,71 @@ FORCE=1   bash scripts/run_weekly.sh   # rebuild + resend an issue that already 
 bash scripts/install_cron.sh --remove  # uninstall the schedule
 ```
 
-Two safeguards worth knowing about:
+Four safeguards worth knowing about:
 
 - **A dated issue is never silently rebuilt.** If `<date>/report.pdf` exists the run exits 0
   with `SKIP`, so a second cron fire or a manual re-run cannot re-send a delivered brief.
   `FORCE=1` overrides.
 - **Dry runs are isolated** into `.dryrun-<date>/` so testing never overwrites a real issue.
+- **The login is checked before any work starts.** `check_auth.sh` runs first; if it fails the
+  run stops immediately with a named cause and an alert, rather than burning a slot and
+  leaving a bare "no PDF produced" in the log.
+- **Failures are mailed, not just logged.** Any non-zero run emails `WEEKLY_AI_ALERT_TO`.
 
 **Cron environment:** cron gives a non-login, non-interactive shell, so `~/.bashrc` is not
 sourced — conda is absent and bare `python3` would be `/usr/bin/python3` (3.9, no pymupdf,
 which would silently drop the page-budget check). `run_weekly.sh` therefore puts
 `miniconda3/bin`, `~/bin` and `~/.local/bin` on PATH explicitly and warns if pymupdf is still
 missing. Verified under a stripped `env -i` shell.
+
+## Keeping the Claude login alive
+
+This is the failure mode that has actually bitten, so it is worth understanding.
+
+`run_weekly.sh` drives the `claude` CLI, which holds an OAuth session: an access token good
+for about eight hours, renewed with a refresh token. **Nothing renews it unless the CLI
+runs.** Left untouched between weekly runs the session goes stale.
+
+That is exactly how the **2026-09-01 issue was lost**. Cron fired on time, on the right node;
+`claude` exited four seconds later with `OAuth session expired and could not be refreshed`;
+no report was built and no one was told for three days. The schedule was never the problem.
+
+Two changes close it:
+
+- `auth_keepalive.sh` runs **daily at 09:00**, which both refreshes the token and proves the
+  refresh path still works. If it ever fails you get an email that morning — with days to
+  act, because a dead login can only be fixed by a human signing in.
+- It runs **again at 14:45 on Tuesday**, so the 15:00 build starts on a token minted minutes
+  earlier rather than one that has been idle since the last run.
+
+Renewing a dead login is manual and unavoidable:
+
+```bash
+ssh login510-27           # the node the cron lives on
+claude                    # sign in interactively
+bash /ibex/user/habiam0b/Weekly_AI_Reports/scripts/check_auth.sh   # confirm
+```
+
+Then rebuild the missed issue with `FORCE=1 bash scripts/run_weekly.sh`.
+
+## When something goes wrong
+
+Set `WEEKLY_AI_ALERT_TO` in `.env` (see `.env.example`) and any failed run emails you. Leave
+it empty and alerting quietly does nothing — `notify.py` never fails a run that is already
+failing.
+
+Alerts carry **no log contents**, only a one-line cause and the log's path. The run log is the
+verbatim transcript of an agent that reads `.env` and the recipient CSV during the same run,
+so it can quote a credential or an address; mailing it through a third-party relay would undo
+the work done to keep those off the wire. Read the log on the machine:
+
+```bash
+tail -40 /ibex/user/habiam0b/Weekly_AI_Reports/logs/run-<date>.log
+tail -20 /ibex/user/habiam0b/Weekly_AI_Reports/logs/auth.log     # daily login checks
+tail -40 /ibex/user/habiam0b/Weekly_AI_Reports/logs/cron.log     # what cron saw
+```
+
+Dry runs suppress alerts — a rehearsal you are watching should not mail you.
 
 ## Sending: SMTP relay and deliverability
 
