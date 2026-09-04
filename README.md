@@ -16,12 +16,17 @@ Weekly_AI_Reports/
 ├── .env                            SMTP credentials — chmod 600, never committed
 ├── .env.example                    template for the above
 ├── .gitignore                      keeps .env and the real recipient list off GitHub
+├── skill/                          the weekly-ai-report skill — install to ~/.claude/skills/
+│   ├── SKILL.md                    how an issue gets researched, written and checked
+│   └── references/beats.md         the beats each issue must sweep
 ├── template/
 │   ├── report_template.tex         the LaTeX template — copy per issue, never edit in place
 │   ├── SOURCES_template.md         schema for the sources log
 │   ├── KAUST_Academy_Logo.png      title block, top left
 │   └── KAUST_Logo.png              title block, top right
 ├── scripts/
+│   ├── _common.sh                  shared setup — works out ROOT and PATH
+│   ├── install_skill.sh            copies skill/ into ~/.claude/skills/
 │   ├── build_report.py             tex → pdf, enforces the 3–5 page budget
 │   ├── check_sources.py            srcref ↔ SOURCES.md correspondence check
 │   ├── submit_weekly.sh            queues the Slurm job (cron target)
@@ -69,8 +74,9 @@ cron spools are per-node, so an entry made on a compute node dies with the alloc
 
 ```bash
 ssh glogin
-bash /ibex/user/habiam0b/Weekly_AI_Reports/scripts/install_cron.sh   # idempotent
-crontab -l                                                          # verify
+cd /path/to/weekly-ai-brief
+bash scripts/install_cron.sh   # idempotent -- paths worked out at install time
+crontab -l                     # verify
 ```
 
 That installs four lines:
@@ -155,9 +161,10 @@ Two changes close it:
 Renewing a dead login is manual and unavoidable:
 
 ```bash
-ssh login510-27           # the node the cron lives on
-claude                    # sign in interactively
-bash /ibex/user/habiam0b/Weekly_AI_Reports/scripts/check_auth.sh   # confirm
+ssh login510-27              # the node this deployment's cron lives on
+claude                       # sign in interactively
+cd /path/to/weekly-ai-brief
+bash scripts/check_auth.sh   # confirm
 ```
 
 Then rebuild the missed issue with `FORCE=1 bash scripts/run_weekly.sh`.
@@ -174,9 +181,10 @@ so it can quote a credential or an address; mailing it through a third-party rel
 the work done to keep those off the wire. Read the log on the machine:
 
 ```bash
-tail -40 /ibex/user/habiam0b/Weekly_AI_Reports/logs/run-<date>.log
-tail -20 /ibex/user/habiam0b/Weekly_AI_Reports/logs/auth.log     # daily login checks
-tail -40 /ibex/user/habiam0b/Weekly_AI_Reports/logs/cron.log     # what cron saw
+tail -40 logs/run-<date>.log   # the run that failed
+tail -20 logs/auth.log         # daily login checks
+tail -40 logs/cron.log         # what cron saw
+tail -20 logs/submit.log       # whether a job was ever queued
 ```
 
 Dry runs suppress alerts — a rehearsal you are watching should not mail you.
@@ -254,7 +262,7 @@ PUBLISH=0 bash scripts/run_weekly.sh
 ### Recreating the repo from scratch
 
 ```bash
-cd /ibex/user/habiam0b/Weekly_AI_Reports
+cd /path/to/weekly-ai-brief
 git init -b main
 gh repo create KAUST-Academy/weekly-ai-brief --private
 git remote add origin https://github.com/KAUST-Academy/weekly-ai-brief.git
@@ -271,6 +279,50 @@ all the helper needs to find the token.
 Edit `List_Of_People_To_Send_To.csv`. Columns are `Name,Email`; the header is required and a
 UTF-8 BOM is tolerated. `send_report.py` refuses to run on a malformed address rather than
 silently skipping it.
+
+## Using this on another machine
+
+Everything needed is in this repo — the skill, the scripts, the template and the logos.
+Nothing points at an account or a cluster: each script works out where it lives from its own
+path, so a clone runs wherever you put it.
+
+```bash
+git clone https://github.com/KAUST-Academy/weekly-ai-brief.git
+cd weekly-ai-brief
+
+bash scripts/install_skill.sh              # copies skill/ into ~/.claude/skills/
+cp .env.example .env && chmod 600 .env     # SMTP details + WEEKLY_AI_ALERT_TO
+cp List_Of_People_To_Send_To.example.csv List_Of_People_To_Send_To.csv
+```
+
+The skill step is not optional. Claude Code loads skills only from `~/.claude/skills/`, never
+from a repo, so until it is installed `run_weekly.sh` asks for a skill that is not there and
+the run produces nothing useful. It is a copy rather than a symlink, so the installed skill
+keeps working if the clone moves — re-run `install_skill.sh` after pulling changes to `skill/`.
+
+Then check it and go:
+
+```bash
+bash scripts/check_auth.sh          # is the Claude login usable?
+bash scripts/install_cron.sh        # schedule it (paths worked out at install time)
+bash scripts/submit_weekly.sh       # or queue one right now
+```
+
+**What you may still want to change:**
+
+| Setting | How |
+|---|---|
+| Slurm partition | `WEEKLY_AI_PARTITION=gpu bash scripts/submit_weekly.sh` (default `batch`) |
+| Python with `pymupdf` | `WEEKLY_AI_CONDA_BIN=/path/to/env/bin` — otherwise the first conda-ish install found, else system `python3` |
+| Repo location | derived automatically; override with `WEEKLY_AI_ROOT` if you ever need to |
+| Logos and branding | swap the two PNGs in `template/` |
+
+`tectonic` is preferred for the build and is looked for on `PATH` and in `~/bin`;
+`build_report.py` falls back to `latexmk` or `pdflatex`.
+
+**Not on a cluster?** There is no Slurm and no login-node reaper, so delete
+`submit_weekly.sh` and `weekly_job.sbatch` and point cron straight at `run_weekly.sh` —
+edit the one line in `install_cron.sh`.
 
 ## Where the standards live
 
