@@ -1,0 +1,39 @@
+name: Source integrity
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  source-integrity:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
+
+      - name: Validate every published brief
+        shell: bash
+        run: |
+          set -euo pipefail
+          found=0
+          while IFS= read -r sources; do
+            folder="${sources%/SOURCES.md}"
+            echo "::group::${folder}"
+            python3 scripts/check_sources.py "${folder}"
+            echo "::endgroup::"
+            found=1
+          done < <(find 20?? -type f -name SOURCES.md -print 2>/dev/null | sort)
+
+          if [[ "${found}" -eq 0 ]]; then
+            echo "No published SOURCES.md files found" >&2
+            exit 1
+          fi
