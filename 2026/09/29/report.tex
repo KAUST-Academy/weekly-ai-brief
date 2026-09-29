@@ -1,0 +1,307 @@
+%==============================================================================
+%  WEEKLY AI BRIEF -- issue #06, week ending 29 September 2026
+%  Engine: tectonic
+%==============================================================================
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------ packages -------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.2cm,top=2.0cm,bottom=2.3cm]{geometry}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+
+\tcbuselibrary{skins,breakable}
+
+\graphicspath{{../../../template/}{./}{template/}}
+
+%------------------------------ palette --------------------------------------
+\definecolor{brandink}{HTML}{103868}    % KAUST navy -- headings, rules
+\definecolor{brandaccent}{HTML}{0B7480} % KAUST teal (darkened to 5.6:1 on white)
+\definecolor{brandsoft}{HTML}{EAF3F5}   % box fills
+\definecolor{brandgrey}{HTML}{5A6672}   % meta text
+
+\hypersetup{colorlinks=true,linkcolor=brandaccent,urlcolor=brandaccent,
+            citecolor=brandaccent,pdfborder={0 0 0}}
+
+%------------------------------ metadata -------------------------------------
+\newcommand{\briefnumber}{06}
+\newcommand{\briefweek}{23--29 September 2026}
+\newcommand{\briefdate}{29 September 2026}
+\newcommand{\briefauthor}{Ali Habibullah}
+\newcommand{\briefaffil}{KAUST}
+\newcommand{\briefscope}{Papers, model releases, benchmarks and policy from the past seven days}
+
+%------------------------------ section styling ------------------------------
+\titleformat{\section}
+  {\normalfont\sffamily\large\bfseries\color{brandink}}{\thesection.}{0.6em}{}
+  [\vspace{-0.55em}{\color{brandaccent}\rule{\textwidth}{0.9pt}}]
+\titlespacing*{\section}{0pt}{1.5ex plus .3ex}{0.9ex}
+
+\titleformat{\subsection}[runin]
+  {\normalfont\sffamily\bfseries\color{brandink}}{}{0pt}{}[\;---]
+\titlespacing*{\subsection}{0pt}{1.25ex plus .2ex}{0.5em}
+
+\setlist[itemize]{leftmargin=1.15em,itemsep=0.25em,topsep=0.35em,parsep=0pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+
+%------------------------------ header / footer ------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{\footnotesize\color{brandgrey}Weekly AI Brief \#\briefnumber\ \textbullet\ \briefweek}
+\fancyfoot[R]{\footnotesize\color{brandgrey}Page \thepage\ of \pageref{LastPage}}
+
+%------------------------------ content macros -------------------------------
+\newcommand{\tldr}[1]{%
+  \begin{tcolorbox}[breakable,enhanced,colback=brandsoft,colframe=brandaccent,
+      boxrule=0.8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,arc=2pt,
+      title={\sffamily\bfseries The week in five lines},fonttitle=\color{white}]
+    \begin{itemize}[leftmargin=1.1em,itemsep=0.3em,topsep=0pt]#1\end{itemize}
+  \end{tcolorbox}}
+
+\newcommand{\entry}[4]{%
+  \par\vspace{0.7em}%
+  {\sffamily\bfseries\color{brandink}#1}\par
+  {\footnotesize\color{brandgrey}#2 \textbullet\ \href{#3}{link} \textbullet\ \srcref{#4}}\par
+  \vspace{0.15em}}
+
+\newcommand{\why}[1]{\par{\small\textbf{Why it matters.} #1}\par}
+
+\newcommand{\srcref}[1]{\textcolor{brandaccent}{[S#1]}}
+
+\newcommand{\stat}[2]{{\sffamily\bfseries\color{brandink}#1}~{\footnotesize\color{brandgrey}#2}}
+
+%==============================================================================
+\begin{document}
+
+%------------------------------ title block ----------------------------------
+\noindent
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedright\includegraphics[height=1.4cm]{KAUST_Academy_Logo.png}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedleft\includegraphics[height=1.5cm]{KAUST_Logo.png}
+\end{minipage}
+\vspace{0.7em}
+
+{\sffamily
+ {\color{brandgrey}\footnotesize ISSUE \#\briefnumber\ \textbullet\ \briefdate}\par
+ \vspace{0.15em}
+ {\LARGE\bfseries\color{brandink}Weekly AI Brief}\par
+ \vspace{0.25em}
+ {\large\color{brandaccent}\briefweek}\par
+ \vspace{0.35em}
+ {\footnotesize\color{brandgrey}\briefscope\\
+  Prepared by \briefauthor, \briefaffil}\par}
+\vspace{0.3em}
+{\color{brandink}\rule{\textwidth}{1.4pt}}
+\vspace{0.6em}
+
+%------------------------------ 1. executive summary -------------------------
+\tldr{
+  \item \textbf{Claude Sonnet 5.5 ships at \$2/\$10 per million tokens.} Artificial Analysis independently places it 3rd of 216 models, two points behind Opus 5.5. \srcref{1}\,\srcref{2}
+  \item \textbf{OpenAI halved its mid-tier prices.} GPT-6 Sol and Luna launched on 22 September at 50\% below GPT-5.6 pricing, about 90 minutes after Anthropic's Opus 5.5. \srcref{3}\,\srcref{5}\,\srcref{19}
+  \item \textbf{Xiaomi posted MIT-licensed 1.02T-parameter MiMo-V2.6 checkpoints.} The 27 September update targets agents that repeat the same tool call. \srcref{7}
+  \item \textbf{Claude agents flagged a new CRISPR-like enzyme family in phage DNA.} Anthropic's own preprint says its function is still untested. \srcref{9}\,\srcref{10}
+  \item \textbf{The UN Security Council heard from Altman, Amodei and Bengio.} The US told the Council that dialogue ``cannot be allowed to drift towards global governance''. \srcref{15}
+}
+
+%------------------------------ 2. models & releases -------------------------
+\section{Model and product releases}
+
+\entry{Claude Sonnet 5.5: near-Opus scores at half the Opus price}{Anthropic \textbullet\ API and all major clouds \textbullet\ 28 September}{https://www.anthropic.com/claude-sonnet-5-5}{1}
+Sonnet 5.5 (\texttt{claude-sonnet-5-5}) costs \$2 input and \$10 output per million tokens,
+with cache reads at \$0.20. It is available on AWS, Google Cloud and Microsoft Azure.
+Anthropic says it is 30\%+ faster than Sonnet~5 and costs up to 30\% less per task.
+Its largest self-reported jump is on Terminal-Bench~4.0, from 10.3\% to 70.6\%, which
+is above Opus~5.5's 66.4\% on the same page. Artificial Analysis independently scores it
+56 on Intelligence Index v4.3.2 (\#3 of 216). It also lists a 1M-token context window
+and flags the model as ``very verbose'': 410M output tokens across the evaluation,
+against an 88M median. \srcref{2}
+\why{For most agentic coding workloads, the default question is now whether Opus is worth twice the price, not whether Sonnet is good enough.}
+
+\entry{GPT-6 Sol and Luna: OpenAI halves prices below the GPT-6 flagship}{OpenAI \textbullet\ API, ChatGPT Work, Codex \textbullet\ 22 September (one day before this window)}{https://openai.com/index/introducing-gpt-6-sol-and-luna/}{3}
+Carried here because they launched on the last day of issue \#05's window, after it was compiled.
+Sol drops from \$4/\$20 to \$2/\$10 and Luna from \$0.20/\$1.20 to \$0.10/\$0.50 per million tokens.
+OpenAI says both models were trained ``with similar methods as GPT-6 Astra''.
+It self-reports DeepSWE~v1.1 at 68.8\% for Sol (max effort), 1.1 points below Claude Fable~5
+at ``approximately 80\% lower cost per task''. On its internal factuality evaluation,
+Sol ``makes about half as many mistakes'' as its predecessor. OpenAI notes that this
+evaluation is built from conversations where users flagged errors, so it is not representative of
+typical use. Cached input reads are discounted 90\%. The API IDs are \texttt{gpt-6-sol} and
+\texttt{gpt-6-luna}. Artificial Analysis scores Sol (max) at 48 (\#20 of 216) with an 872K context window. \srcref{4}
+\why{Bulk extraction and summarisation jobs that were routed to small models on cost grounds should be re-priced against Luna at \$0.10/\$0.50.}
+
+\entry{Claude Opus 5.5 tops the independent index}{Anthropic \textbullet\ API and all major clouds \textbullet\ 22 September (one day before this window)}{https://www.anthropic.com/claude-opus-5-5}{5}
+Also a 22 September launch that issue \#05 missed. Opus~5.5 costs \$4/\$20 per million tokens
+(\$8/\$40 in fast mode), which Anthropic says is ``40\% less to run than Opus~5'' on
+typical workloads. Its self-reported table puts it ahead of GPT-6 Astra on Terminal-Bench~4.0
+(66.4\% vs 57.9\%) and behind Astra on AutomationBench (40.0\% vs 41.4\%) and Terminal-Bench-Science
+(58.7\% vs 64.6\%). Artificial Analysis independently ranks it \#1 of 216 on Intelligence Index
+v4.3.2, at 58. \srcref{6}
+\why{The model at the top of the independent index is also, by Anthropic's account, 40\% cheaper to run than Opus~5, so teams that stayed on Fable~5.1 for quality should re-run their evals on Opus~5.5.}
+
+\entry{MiMo-V2.6 open weights, 1.02T parameters, MIT licence}{Xiaomi \textbullet\ Hugging Face and ModelScope \textbullet\ MOPD checkpoints posted 27 September}{https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-MOPD}{7}
+Pro is a sparse MoE with 1.02T total and 42B active parameters. Flash has 309B total
+and 15B active. Both have a 1M-token context and native text, image, video and audio input.
+The RL checkpoints appeared on 21--22 September. The in-window 27 September ``MOPD''
+checkpoints add multi-teacher on-policy distillation and target tool-call repetition,
+a failure mode where an agent ``keeps issuing the same or highly similar tool calls,
+appearing busy while making no progress''. Xiaomi's self-reported table for the RL checkpoint puts Pro at
+71.9 on DeepSWE~v1.1, against 74.0 for Claude Opus~5. \srcref{8}
+\why{A trillion-parameter checkpoint under MIT removes the licence question for fine-tuning and commercial use, and the repetition failure mode it names is worth checking for in any agent harness.}
+
+%------------------------------ 3. research ----------------------------------
+\section{Research worth reading}
+
+\entry{Claude agents flag a CRISPR-like reverse-transcriptase family}{Yoon, Athukoralage, Ameisen et al., Anthropic \textbullet\ preprint, 23 September}{https://www.anthropic.com/news/claude-discovers-novel-enzyme-system}{9}
+Claude Code agents surveyed reverse-transcriptase loci across 1.9 billion protein clusters.
+They surfaced ``array-associated RTs'' (ART): an RT, a dedicated partner gene and a long
+array of roughly 200-nucleotide repeat units, found in bacteriophage DNA. The preprint
+reports 95 distinct ART RT clusters, 28 of them with detectable upstream arrays. \srcref{10}
+Anthropic's post puts the campaign at about 950 agents, 21 hours and 210 million tokens.
+The preprint is explicit that ``ART's biochemical activity and biological function remain
+untested''. What the agents did was anomaly detection, not a demonstrated mechanism.
+\why{It is a concrete, checkable case of an agent campaign surfacing an uncharacterised enzyme family; whether it matters biologically depends on functional assays the preprint says have not been done.}
+
+\entry{Just-in-Time Memory: curate agent memory at read time, not write time}{Zhou, Li, Liu, Yavuz, Joty \textbullet\ arXiv:2609.27334 \textbullet\ 23 September}{https://arxiv.org/abs/2609.27334}{11}
+Most agent memory systems compress each finished trajectory into a fixed reflection or
+skill before anyone knows what future task will need it. JitMem keeps raw trajectories.
+A trained curator writes a task-specific payload only when a new task arrives, which also
+lets it learn from immediate task success. Over the strongest baseline it gains 16.2
+(ALFWorld), 16.3 (WebShop) and 3.9 ($\tau^2$-bench) absolute success-rate points. The
+arXiv page links no code.
+\why{If you are building agent memory, storing raw traces and summarising on retrieval is cheap to try and beat learned write-time summaries here.}
+
+\entry{A measurable definition of ``interesting'' theorems}{Patel, Rammal, Hayat, Munos, Kempe \textbullet\ arXiv:2609.28603 \textbullet\ 23 September}{https://arxiv.org/abs/2609.28603}{12}
+The authors define a theorem's interestingness as the ratio of proof length to statement
+length. They train a 27B model to predict proof difficulty and use it to select
+LLM-generated theorems for a growing machine-verified library. Selection cuts overlap with
+existing Mathlib from 91.9\% to 30.6\%. No code link is given on the arXiv page.
+\why{Automated maths has had a verifier but no filter; a cheap, checkable proxy for novelty is the missing piece for self-expanding formal libraries.}
+
+\entry{Transformers can hold two next-token distributions at once}{Tikhonov, Korznikov, \ldots, Oseledets, Tutubalina \textbullet\ arXiv:2609.29845 \textbullet\ 24 September}{https://arxiv.org/abs/2609.29845}{13}
+When inputs from two text streams are linearly combined, the model outputs a superposition
+of the two next-token distributions. The authors find this property is architectural rather
+than learned, and that training weakens it. Fine-tuning restores it, and a new decoding
+method produces two coherent continuations from a single forward pass. No code is linked.
+\why{If this reproduces at scale, it is a new route to batched or speculative generation that needs no extra model.}
+
+\entry{PISA: block-sparse attention in \texorpdfstring{$O(N\log N)$}{O(N log N)}}{Tang, Qin, Pan, Li, Liu \textbullet\ arXiv:2609.31093 \textbullet\ 25 September}{https://arxiv.org/abs/2609.31093}{14}
+Block-sparse attention still spends quadratic time choosing which blocks to keep. PISA
+instead picks blocks by a pyramid Top-$K$ search over $O(\log N)$ pooled key levels, using
+fused Triton kernels for training and inference. Against its baseline it is comparable
+on commonsense reasoning and better on retrieval. The abstract gives no speed numbers
+and no code link, so the wall-clock gain is unverified.
+\why{Block selection is the remaining quadratic step in long-context sparse attention; this removes it, if the kernels hold up.}
+
+%------------------------------ 4. benchmarks & evals ------------------------
+\section{Benchmarks, evaluations and reproductions}
+
+{\small
+\begin{tabularx}{\textwidth}{@{}X r r r l@{}}
+\toprule
+\textbf{Benchmark} & \textbf{Sonnet 5.5} & \textbf{Opus 5.5} & \textbf{GPT-6 Sol} & \textbf{Reported by} \\
+\midrule
+AA Intelligence Index v4.3.2 & 56 & 58 & 48 & Artificial Analysis \\
+FrontierCode 1.1 (Main)      & 46.2\% & 54.4\% & 49.3\% & Anthropic \\
+GDPval-AA v2.1 (Elo)         & 1844 & 1846 & 1487 & Anthropic \\
+AA-Briefcase v1.1 (Elo)      & 1811 & 1822 & 1483 & Anthropic \\
+Chartography, no tools       & 61.6\% & 64.4\% & 53.6\% & Anthropic \\
+Terminal-Bench 4.0           & 70.6\% & 66.4\% & --- & Anthropic \\
+OSWorld 2.1                  & 80.1\% & 81.8\% & --- & Anthropic \\
+\bottomrule
+\end{tabularx}}
+\vspace{0.3em}
+
+{\footnotesize\color{brandgrey}Sources: row 1 \srcref{2}\,\srcref{6}\,\srcref{4}; rows 2--7 from Anthropic's Sonnet~5.5 table \srcref{1}. Only row~1 is an independent measurement.}
+
+Only the first row is independent. On it, Opus~5.5 and Sonnet~5.5 sit 10 and 8 points
+above GPT-6 Sol (max). The remaining rows are Anthropic's own and include its choice of
+harness for the OpenAI column. Two harness gaps showed up this week. First, Chartography for
+Opus~5.5 is 64.4\% ``no tools'' on the Sonnet page and 89.0\% ``with tools'' on the Opus
+page \srcref{5}. The benchmark and model are the same; only tool access differs.
+Second, Claude Opus~5 on AutomationBench~v1.0.6 is 26.9\% in both OpenAI's and
+Anthropic's tables \srcref{3}\,\srcref{5}, but 50.3 in Xiaomi's \srcref{8}. Cross-lab
+comparisons on agent benchmarks are not reliable until labs publish their harness settings.
+
+%------------------------------ 5. industry & policy -------------------------
+\section{Industry, funding and policy}
+\begin{itemize}
+  \item \textbf{UN Security Council, 10228th meeting (23 September).} The meeting was chaired by France,
+  with Bengio, Altman, Amodei and Hugging Face's Delangue as briefers. Amodei proposed ``a ban on using AI to
+  make biological weapons'', verification systems, and common testing standards with ``a notification
+  system for AI incidents''. The White House's Michael Kratsios answered that international dialogue
+  ``cannot be allowed to drift towards global governance''. \srcref{15}
+  \item \textbf{Ban Artificial Superintelligence Act (introduced 23 September).} Sen.\ Sanders and Rep.\ Casar's
+  bill would ban AI that ``exceeds human cognitive performance and capabilities across most domains'',
+  pause advanced development until a new cabinet-level Department of AI sets rules, and allow up to
+  20 years' imprisonment. It is a bill introduced by two members, not law. \srcref{16}
+  \item \textbf{Oregon Executive Order 26-26 (23 September).} The order directs the state CIO to draft third-party
+  AI-safety review standards and to assess a ``kill switch'' requirement before agencies procure frontier
+  models. The CIO's proposal is due within 90 days. It binds state procurement only. \srcref{17}
+\end{itemize}
+
+%------------------------------ 6. what to watch -----------------------------
+\section{What to watch next week}
+\begin{itemize}
+  \item \textbf{OpenAI DevDay, San Francisco, 29 September.} The event falls on this issue's
+  publication date \srcref{18}. What actually ships (as opposed to the rumoured lists circulating
+  beforehand) is next week's lead.
+  \item \textbf{Independent scores beyond Artificial Analysis for Sonnet~5.5 and GPT-6 Sol.} The
+  vendor tables disagree on harness settings. The first third-party agent-benchmark runs will
+  show whether Sonnet~5.5's Terminal-Bench lead over Opus~5.5 holds.
+  \item \textbf{Wet-lab follow-up on ART.} The open question is whether any outside lab reports
+  expression or activity data for the array-associated RTs, which is what would turn an
+  agent-found anomaly into a finding.
+\end{itemize}
+
+%------------------------------ 7. sources -----------------------------------
+\clearpage
+\section{Sources}
+{\footnotesize
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\textbf{\#} & \textbf{Reference} \\
+\midrule
+S1 & Anthropic. \emph{Introducing Claude Sonnet 5.5}. 28 Sep 2026. \url{https://www.anthropic.com/claude-sonnet-5-5} \\
+S2 & Artificial Analysis. \emph{Claude Sonnet 5.5}. Live page, accessed 29 Sep 2026. \url{https://artificialanalysis.ai/models/claude-sonnet-5-5} \\
+S3 & OpenAI. \emph{Introducing GPT-6 Sol and Luna}. 22 Sep 2026. \url{https://openai.com/index/introducing-gpt-6-sol-and-luna/} \\
+S4 & Artificial Analysis. \emph{GPT-6 Sol (max)}. Live page, accessed 29 Sep 2026. \url{https://artificialanalysis.ai/models/gpt-6-sol} \\
+S5 & Anthropic. \emph{Introducing Claude Opus 5.5}. 22 Sep 2026. \url{https://www.anthropic.com/claude-opus-5-5} \\
+S6 & Artificial Analysis. \emph{Claude Opus 5.5}. Live page, accessed 29 Sep 2026. \url{https://artificialanalysis.ai/models/claude-opus-5-5} \\
+S7 & Xiaomi MiMo. \emph{MiMo-V2.6-Pro-MOPD model card}. 27 Sep 2026. \url{https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-MOPD} \\
+S8 & Xiaomi MiMo. \emph{MiMo-V2.6-Pro-RL model card}. 21 Sep 2026. \url{https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-RL} \\
+S9 & Anthropic. \emph{Claude discovers a novel enzyme system with CRISPR-like repeats}. 23 Sep 2026. \url{https://www.anthropic.com/news/claude-discovers-novel-enzyme-system} \\
+S10 & Yoon, P.\,H. et al. \emph{Autonomous AI agents discover reverse transcriptases with tandem repeat arrays}. alphaXiv, 23 Sep 2026. \url{https://www.alphaxiv.org/abs/2609.ai-agents-discover-reverse-transcriptases} \\
+S11 & Zhou, Y. et al. \emph{Just-in-Time Memory}. arXiv:2609.27334, 23 Sep 2026. \url{https://arxiv.org/abs/2609.27334} \\
+S12 & Patel, N. et al. \emph{Learning to Discover Interesting Mathematics}. arXiv:2609.28603, 23 Sep 2026. \url{https://arxiv.org/abs/2609.28603} \\
+S13 & Tikhonov, P. et al. \emph{Your Transformer Can Hold Two Thoughts at Once}. arXiv:2609.29845, 24 Sep 2026. \url{https://arxiv.org/abs/2609.29845} \\
+S14 & Tang, B. et al. \emph{Block Sparse Attention with Log-Linear Complexity}. arXiv:2609.31093, 25 Sep 2026. \url{https://arxiv.org/abs/2609.31093} \\
+S15 & United Nations. \emph{Security Council, 10228th meeting: AI and international security}. 23 Sep 2026. \url{https://transcripts.un.org/en/sc/10228} \\
+S16 & Office of Rep.\ Greg Casar. \emph{Casar, Sanders introduce legislation to create new federal agency, ban artificial superintelligence}. 23 Sep 2026. \url{https://casar.house.gov/media/press-releases/news-casar-sanders-introduce-legislation-create-new-federal-agency-ban} \\
+S17 & Office of the Governor of Oregon. \emph{Governor Kotek issues executive order to advance AI safety and oversight}. 23 Sep 2026. \url{https://apps.oregon.gov/oregon-newsroom/OR/GOV/Posts/Post/governor-kotek-issues-executive-order-to-advance-ai-safety-and-oversight} \\
+S18 & OpenAI. \emph{Announcing OpenAI DevDay 2026}. \url{https://openai.com/index/devday-2026/} \\
+S19 & TechCrunch. \emph{OpenAI launches GPT-6 Sol and Luna}. 22 Sep 2026. \url{https://techcrunch.com/2026/09/22/openai-launches-gpt-6-sol-and-luna/} \\
+\bottomrule
+\end{tabularx}}
+
+\vspace{0.8em}
+{\footnotesize\color{brandgrey}
+Compiled \briefdate. Every figure in this brief was read from the linked primary
+source on that date. Corrections: \texttt{\briefauthor}.}
+
+\end{document}
