@@ -1,0 +1,319 @@
+%==============================================================================
+%  WEEKLY AI BRIEF -- issue #07, week ending 6 October 2026
+%  Engine: tectonic
+%==============================================================================
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------ packages -------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.2cm,top=2.0cm,bottom=2.3cm]{geometry}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{tcolorbox}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+
+\tcbuselibrary{skins,breakable}
+
+\graphicspath{{../../../template/}{./}{template/}}
+
+%------------------------------ palette --------------------------------------
+\definecolor{brandink}{HTML}{103868}    % KAUST navy -- headings, rules
+\definecolor{brandaccent}{HTML}{0B7480} % KAUST teal (darkened to 5.6:1 on white)
+\definecolor{brandsoft}{HTML}{EAF3F5}   % box fills
+\definecolor{brandgrey}{HTML}{5A6672}   % meta text
+
+\hypersetup{colorlinks=true,linkcolor=brandaccent,urlcolor=brandaccent,
+            citecolor=brandaccent,pdfborder={0 0 0}}
+
+%------------------------------ metadata -------------------------------------
+\newcommand{\briefnumber}{07}
+\newcommand{\briefweek}{30 September -- 6 October 2026}
+\newcommand{\briefdate}{6 October 2026}
+\newcommand{\briefauthor}{Ali Habibullah}
+\newcommand{\briefaffil}{KAUST}
+\newcommand{\briefscope}{Papers, model releases, benchmarks and policy from the past seven days}
+
+%------------------------------ section styling ------------------------------
+\titleformat{\section}
+  {\normalfont\sffamily\large\bfseries\color{brandink}}{\thesection.}{0.6em}{}
+  [\vspace{-0.55em}{\color{brandaccent}\rule{\textwidth}{0.9pt}}]
+\titlespacing*{\section}{0pt}{1.5ex plus .3ex}{0.9ex}
+
+\titleformat{\subsection}[runin]
+  {\normalfont\sffamily\bfseries\color{brandink}}{}{0pt}{}[\;---]
+\titlespacing*{\subsection}{0pt}{1.25ex plus .2ex}{0.5em}
+
+\setlist[itemize]{leftmargin=1.15em,itemsep=0.25em,topsep=0.35em,parsep=0pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+
+%------------------------------ header / footer ------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{\footnotesize\color{brandgrey}Weekly AI Brief \#\briefnumber\ \textbullet\ \briefweek}
+\fancyfoot[R]{\footnotesize\color{brandgrey}Page \thepage\ of \pageref{LastPage}}
+
+%------------------------------ content macros -------------------------------
+\newcommand{\tldr}[1]{%
+  \begin{tcolorbox}[breakable,enhanced,colback=brandsoft,colframe=brandaccent,
+      boxrule=0.8pt,left=10pt,right=10pt,top=8pt,bottom=8pt,arc=2pt,
+      title={\sffamily\bfseries The week in five lines},fonttitle=\color{white}]
+    \begin{itemize}[leftmargin=1.1em,itemsep=0.3em,topsep=0pt]#1\end{itemize}
+  \end{tcolorbox}}
+
+\newcommand{\entry}[4]{%
+  \par\vspace{0.7em}%
+  {\sffamily\bfseries\color{brandink}#1}\par
+  {\footnotesize\color{brandgrey}#2 \textbullet\ \href{#3}{link} \textbullet\ \srcref{#4}}\par
+  \vspace{0.15em}}
+
+\newcommand{\why}[1]{\par{\small\textbf{Why it matters.} #1}\par}
+
+\newcommand{\srcref}[1]{\textcolor{brandaccent}{[S#1]}}
+
+\newcommand{\stat}[2]{{\sffamily\bfseries\color{brandink}#1}~{\footnotesize\color{brandgrey}#2}}
+
+%==============================================================================
+%==============================================================================
+\begin{document}
+
+%------------------------------ title block ----------------------------------
+\noindent
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedright\includegraphics[height=1.4cm]{KAUST_Academy_Logo.png}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.48\textwidth}
+  \raggedleft\includegraphics[height=1.5cm]{KAUST_Logo.png}
+\end{minipage}
+\vspace{0.7em}
+
+{\sffamily
+ {\color{brandgrey}\footnotesize ISSUE \#\briefnumber\ \textbullet\ \briefdate}\par
+ \vspace{0.15em}
+ {\LARGE\bfseries\color{brandink}Weekly AI Brief}\par
+ \vspace{0.25em}
+ {\large\color{brandaccent}\briefweek}\par
+ \vspace{0.35em}
+ {\footnotesize\color{brandgrey}\briefscope\\
+  Prepared by \briefauthor, \briefaffil}\par}
+\vspace{0.3em}
+{\color{brandink}\rule{\textwidth}{1.4pt}}
+\vspace{0.6em}
+
+%------------------------------ 1. executive summary -------------------------
+\tldr{
+  \item \textbf{Google announced Gemini 4 Argon, but only cyber defenders can use it.} It is priced at \$2/\$10 per million tokens at launch. Artificial Analysis ranks it 8th of 224, not first. \srcref{1}\,\srcref{2}
+  \item \textbf{OpenAI's GPT-6.1 Sol costs one fifth of GPT-6 Astra.} OpenAI says it nearly matches Astra on agentic coding. Artificial Analysis puts it one point below Astra. \srcref{3}\,\srcref{5}
+  \item \textbf{Aleph Alpha released Kolibri-1 under Apache 2.0.} It is a 78B-total, 3.46B-active German/English mixture-of-experts model with a 1M-token context. \srcref{6}
+  \item \textbf{Anthropic says Z.ai's open-weight GLM-5.3 writes working exploits.} Simple tricks got past its safeguards 64--100\% of the time. \srcref{17}
+  \item \textbf{California signed 13 more AI bills.} One bars employers from firing or disciplining workers on an AI decision alone. \srcref{18}
+}
+
+%------------------------------ 2. models & releases -------------------------
+\section{Model and product releases}
+
+\entry{Gemini 4 Argon: Google's new frontier model, limited to cyber defenders for now}{Google DeepMind \textbullet\ Fairwind Program only \textbullet\ 30 September}{https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/}{1}
+For now Argon is available only to vetted cyber defenders in Google's Fairwind Program,
+who get it ``without cyber guardrails''. Google says paid API customers and Google AI
+Ultra subscribers come next. It gives no date and no API model ID. The output limit rises
+to 1M tokens, up from 64K. Launch pricing is \$2 input and \$10 output per million tokens,
+with cached input 95\% off. The standard price after the launch period is \$4/\$20.
+Google's self-reported numbers include 77.9\% on DeepSWE~v1.1, which Google calls a new
+state of the art, 51.3\% on AutomationBench (\#1), 91.7\% on LVBench and a tie for first on
+CWE-bench~v1 at 68\%. Google also says Argon leads the Vals Index but quotes no competitor
+scores. Artificial Analysis, testing independently, scores Argon (High) 53 on Intelligence
+Index v4.3.2, \#8 of 224 models. \srcref{2}
+\why{Most teams cannot use Argon yet, so they should plan around next week's models, not its launch-blog numbers.}
+
+\entry{GPT-6.1 Sol: OpenAI says near-Astra results at a fifth of the price}{OpenAI \textbullet\ API, ChatGPT Work, Codex \textbullet\ 29 September (DevDay)}{https://openai.com/index/introducing-gpt-6-1-sol/}{3}
+This launched at DevDay on 29 September, the day issue \#06 went out, so it was held over to
+this issue. \texttt{gpt-6.1-sol} costs \$2 input, \$0.10 cached input and \$10 output per
+million tokens. That is one fifth of GPT-6 Astra's \$10/\$50, and the cached-input price is
+half of GPT-6 Sol's. OpenAI's self-reported claims: on DeepSWE~v1.1 it matches Astra and is
+6.4 points above GPT-6 Sol's best score. On AutomationBench it is 2.2 points above Opus~5.5 at
+medium effort. On the OSWorld~2.0 offline set it is within 2.1 points of Astra. On
+Terminal-Bench Science it costs \$5.47 per task, against \$23.80 for Astra. Astra still has
+the top score there, at 68.1\%. Artificial Analysis scores Sol (Max) at 52, \#11 of 224. \srcref{5}
+DevDay also brought ``dots'', which OpenAI calls always-on agents; computer use in the Agents API;
+an Ultrafast tier that OpenAI says generates tokens up to 8$\times$ faster in Codex; and a
+Decisions API built on Luna, in limited preview. \srcref{4}
+\why{When an agent pipeline spends most of its tokens re-reading the same context, the \$0.10 cached-input price matters more than the headline price.}
+
+\entry{Kolibri-1: an Apache-2.0 German/English MoE from Aleph Alpha}{Aleph Alpha \textbullet\ open weights on Hugging Face \textbullet\ posted 2 October}{https://huggingface.co/Aleph-Alpha/Kolibri-1}{6}
+Kolibri has 78B total and 3.46B active parameters (384 experts per layer, 6 routed plus 1 shared).
+It was trained on 20T tokens: about 62.5\% English, 23.9\% German and 13.6\% code. Its native
+context is 262,144 tokens, and Aleph Alpha says it has validated quality up to 1,048,576.
+The FP8 weights need about 78\,GB, which fits on one H200 or B200. Aleph Alpha's own table
+(same harness for every model) gives Kolibri an English overall average of 75.5, against
+74.7 for Qwen3.5-35B-A3B; the German averages are 70.8 and 69.8. On SWE-bench Verified it
+scores 66.4, behind Qwen3.6-35B-A3B's 73.8. Pre-training took 392k B200 GPU-hours, and the
+card lists total training compute as 6.4e23 FLOPs.
+\why{It is a European open model with a published compute budget and a German-specific tokenizer, and it fits on one GPU.}
+
+\entry{Clef: Cloudflare open-sources models that output decisions, not text}{Cloudflare \textbullet\ Apache 2.0, Workers AI \textbullet\ 30 September--1 October}{https://huggingface.co/Cloudflare/clef}{7}
+Clef (fine-tuned from Qwen3.8-27B) and Clef-Flash (from Qwen3.5-9B) take a state and a schema of
+typed questions. In one forward pass they return a probability for every allowed answer, with
+no free-text output to parse. Cloudflare reports 97.43 macro-F1 on CLINC150+OOS and
+94.20 on BANKING77 for Clef. It gives a median latency of 38.8\,ms for Clef-Flash,
+against 524.1\,ms for its own earlier Jev model. All numbers are self-reported. \srcref{8}
+\why{Routing and classification steps in an agent can move to a model that cannot produce malformed JSON.}
+
+%------------------------------ 3. research ----------------------------------
+\section{Research worth reading}
+
+\entry{Sharpening Tax: RL post-training trades coverage for consistency in agents too}{Oh, Zeng, \ldots, Mirhoseini, Li \textbullet\ arXiv:2610.01509 \textbullet\ 1 October}{https://arxiv.org/abs/2610.01509}{9}
+The authors give base (pre-trained only) LLMs a light inference harness. These base agents
+score far lower on pass@1 than their post-trained versions, but with enough samples they
+often solve more distinct tasks (higher pass@K). The cause is that post-training pushes each
+task towards ``always solved or never solved''. The paper names this cost the ``Sharpening Tax''
+and measures it across 14 base/post-trained pairs from four model families on three agentic
+benchmarks (42 cases). The tax shows up in most of them and can be estimated from a few rollouts.
+A proposed per-prompt temperature sampler (PTGS) pays less of the tax during RL.
+The paper improves both single-shot accuracy and pass@K.
+\why{If your agent relies on best-of-$K$ sampling with a verifier, test the base checkpoint as well as the post-trained one.}
+
+\entry{RealCompanion: ten real human--AI relationships, 27,218 messages}{Behnam, Kim, Yang \textbullet\ arXiv:2610.01780 \textbullet\ 1 October}{https://arxiv.org/abs/2610.01780}{10}
+The dataset covers ten real relationships between a person and an AI companion, each lasting
+up to 120 days. Only 3.4\% of user messages depend on something said earlier. When one does,
+the earlier message is a median 2,157 messages back. A recency window finds it 95.9\% of the
+time overall but only 2.2\% of the time when it is far back. Relabelling the same history as
+``memories'' makes models bring up the past 10--14 points more often, even when it is
+irrelevant. The data is released.
+\why{Memory evaluations built from invented personas probably overstate how often recall matters, and averaging over all messages hides the long-range cases where it fails.}
+
+\entry{Science or Slop?: detecting AI-written papers by their reasoning, not their tokens}{Oh, Lee, Ahn, Kim, Kang \textbullet\ arXiv:2610.00531 \textbullet\ 30 September}{https://arxiv.org/abs/2610.00531}{11}
+SciSlopBench pairs 390 AI-generated papers with human papers matched on research problem and
+contribution type. It scores six measures of structure, argument and artifacts. Together they
+identify the AI paper in each pair 85.9\% of the time, against 68.7\% for the Binoculars
+token-level detector. Higher scores track lower ICLR ratings in every year from 2017 to 2025.
+Prompting a model to reduce the measures directly led to reward hacking. The authors'
+evidence-grounded revision harness instead closes 63\% of the remaining gap.
+\why{Reviewers and program committees get a detector aimed at broken reasoning rather than word choice, which is harder to evade by paraphrasing.}
+
+\entry{Kandinsky 6.0 Video: open text-to-video with synchronized audio, MIT licence}{Team Kandinsky \textbullet\ arXiv:2610.05608 \textbullet\ 4 October}{https://arxiv.org/abs/2610.05608}{12}
+The family has two sizes: Lite (3B) and Pro (29B). Both generate 5-second clips with
+synchronized 44\,kHz audio, including lip-sync, from text or an image, and a built-in
+super-resolution model upscales to 1920$\times$1080. Video and audio streams are linked by
+two-way cross-attention. The checkpoints have been appearing on Hugging Face since
+9 September; the new item this week is the technical report. The quality claims come from
+the team's own side-by-side human evaluation. It reports Pro clearly beats Kandinsky~5.0 and
+is ``competitive'' with leading models, with no independent ranking cited.
+\why{It is one of the few open-weight models that generate video and speech together, under a licence that allows commercial use.}
+
+%------------------------------ 4. benchmarks & evals ------------------------
+\section{Benchmarks, evaluations and reproductions}
+
+Two labs announced frontier models this week, and each claims a lead on its own benchmark
+table. Artificial Analysis runs the same tests on every model, and its index shows them
+in a tight cluster below Anthropic's September releases:
+
+{\small
+\begin{tabularx}{\textwidth}{@{}X r r l@{}}
+\toprule
+\textbf{Model (AA variant)} & \textbf{AA Index v4.3.2} & \textbf{Rank / 224} & \textbf{Released} \\
+\midrule
+Claude Opus 5.5            & 58 & \#1  & Sep \srcref{13} \\
+Claude Sonnet 5.5          & 56 & \#2  & 28 Sep \srcref{14} \\
+Claude Fable 5.1           & 53 & \#5  & Sep \srcref{15} \\
+GPT-6 Astra                & 53 & \#7  & Sep \srcref{16} \\
+Gemini 4 Argon (High)      & 53 & \#8  & 30 Sep \srcref{2} \\
+GPT-6.1 Sol (Max)          & 52 & \#11 & 29 Sep \srcref{5} \\
+\bottomrule
+\end{tabularx}}
+\vspace{0.4em}
+
+\textbf{Is the movement real?} Google's 77.9\% on DeepSWE~v1.1 is self-reported and so far
+not reproduced. It sits above the scores reported for Claude Fable~5 and GPT-6 Sol
+on the same benchmark (issue \#06). AutomationBench is the bigger warning. Google gives Argon 51.3\% and
+ranks it first, while OpenAI's GPT-6.1 Sol page compares against Opus~5.5 and notes that
+Claude Fable~5.1's cost figure leaves out fallbacks, which happened on about 40\% of tasks.
+Last week's issue showed two labs reporting Claude Opus~5 at 26.9\% and 50.3\% on this same
+benchmark. Until the harness is pinned, AutomationBench numbers from different labs should
+not be compared directly. Ranks 5--8 above are tied at 53, so their order says little.
+
+%------------------------------ 5. industry & policy -------------------------
+\section{Industry, funding and policy}
+
+\begin{itemize}
+  \item \textbf{Anthropic: GLM-5.3's safeguards are easy to bypass.} Anthropic's Frontier
+  Red Team (29 September, held over from \#06) tested Z.ai's open-weight model. It produced
+  end-to-end V8 exploits in 50 of 410 ExploitBench attempts; Claude Mythos Preview managed 56.
+  A cover-story prompt got it to engage with overtly harmful attack tasks 64\% of the time,
+  and prefilling its thinking raised that to 92\%. An abliterated copy, made for about \$4,400
+  of compute, engaged 100\% of the time. Safeguarded Claude models stayed at zero. Anthropic
+  is a direct competitor, and these are its own simulated tests; NIST's CAISI, which it cites,
+  independently judged GLM-5.3 the most cyber-capable open-weight model. \srcref{17}
+  \item \textbf{California enacts 13 more AI bills (30 September).} SB~947 bars employers
+  from relying only on AI to discipline or fire workers. SB~951 requires disclosure when a mass
+  layoff is caused by AI. AB~1331 and AB~1883 limit workplace surveillance. SB~1000 and
+  AB~2713 update the AI Transparency Act's provenance rules. AB~1864 sets customer-screening
+  rules for gene-synthesis providers. Newsom also signed an executive order keeping the term
+  ``Artificial Intelligence'' in state use. \srcref{18} That answers a 29 September White House
+  order telling federal agencies to say ``Super Intelligence'' instead. \srcref{19}
+  \item \textbf{Anthropic commits \$100M to train 10,000 ``Frontier Deployed Engineers'' by
+  end-2027 (2 October).} The course is a multi-day in-person block followed by a 12-week residency
+  leading a Claude project at the engineer's own employer. First cohorts include engineers
+  from Accenture, Deloitte, McKinsey, Morgan Stanley and Novo Nordisk. \srcref{20}
+\end{itemize}
+
+%------------------------------ 6. what to watch -----------------------------
+\section{What to watch next week}
+
+\begin{itemize}
+  \item \textbf{OpenAI rollouts it says are ``coming days'' away:} GPT-6.1 Sol Ultrafast and
+  broad release of the Decisions API. Check whether either has shipped by 13 October. \srcref{3}\,\srcref{4}
+  \item \textbf{Gemini 4 Argon outside Fairwind.} Google promises paid-API and AI Ultra access but
+  gives no date. Once access opens, check whether anyone outside Google reproduces the 77.9\% DeepSWE score. \srcref{1}
+  \item \textbf{A response to the GLM-5.3 findings.} Watch whether Z.ai answers Anthropic's
+  report or changes how it releases models, and whether CAISI publishes more open-weight cyber assessments. \srcref{17}
+\end{itemize}
+
+%------------------------------ 7. sources -----------------------------------
+\clearpage
+\section{Sources}
+{\footnotesize
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\textbf{\#} & \textbf{Reference} \\
+\midrule
+S1  & Google (K. Kavukcuoglu). \emph{Gemini 4 Argon: our next era of frontier intelligence}. Google blog, 30 Sep 2026. \url{https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/} \\
+S2  & Artificial Analysis. \emph{Gemini 4 Argon (High)}. Live page, accessed 6 Oct 2026. \url{https://artificialanalysis.ai/models/gemini-4-argon} \\
+S3  & OpenAI. \emph{Introducing GPT-6.1 Sol}. 29 Sep 2026. \url{https://openai.com/index/introducing-gpt-6-1-sol/} \\
+S4  & OpenAI. \emph{DevDay 2026 Recap}. 29 Sep 2026. \url{https://openai.com/index/devday-2026-recap/} \\
+S5  & Artificial Analysis. \emph{GPT-6.1 Sol (Max)}. Live page, accessed 6 Oct 2026. \url{https://artificialanalysis.ai/models/gpt-6-1-sol} \\
+S6  & Aleph Alpha. \emph{Kolibri-1} model card. Hugging Face, 2 Oct 2026. \url{https://huggingface.co/Aleph-Alpha/Kolibri-1} \\
+S7  & Cloudflare. \emph{Clef} model card. Hugging Face, 30 Sep 2026. \url{https://huggingface.co/Cloudflare/clef} \\
+S8  & Cloudflare. \emph{Clef decision models}. Cloudflare blog, 1 Oct 2026. \url{https://blog.cloudflare.com/clef-decision-models} \\
+S9  & Oh et al. \emph{Sharpening Tax in Post-Training}. arXiv:2610.01509, 1 Oct 2026. \url{https://arxiv.org/abs/2610.01509} \\
+S10 & Behnam, Kim, Yang. \emph{RealCompanion}. arXiv:2610.01780, 1 Oct 2026. \url{https://arxiv.org/abs/2610.01780} \\
+S11 & Oh et al. \emph{Science or Slop?} arXiv:2610.00531, 30 Sep 2026. \url{https://arxiv.org/abs/2610.00531} \\
+S12 & Team Kandinsky. \emph{Kandinsky 6.0 Video}. arXiv:2610.05608, 4 Oct 2026. \url{https://arxiv.org/abs/2610.05608} \\
+S13 & Artificial Analysis. \emph{Claude Opus 5.5}. Live page, accessed 6 Oct 2026. \url{https://artificialanalysis.ai/models/claude-opus-5-5} \\
+S14 & Artificial Analysis. \emph{Claude Sonnet 5.5}. Live page, accessed 6 Oct 2026. \url{https://artificialanalysis.ai/models/claude-sonnet-5-5} \\
+S15 & Artificial Analysis. \emph{Claude Fable 5.1}. Live page, accessed 6 Oct 2026. \url{https://artificialanalysis.ai/models/claude-fable-5-1} \\
+S16 & Artificial Analysis. \emph{GPT-6 Astra}. Live page, accessed 6 Oct 2026. \url{https://artificialanalysis.ai/models/gpt-6-astra} \\
+S17 & Anthropic Frontier Red Team. \emph{GLM-5.3 and the spread of advanced cyber capabilities}. 29 Sep 2026. \url{https://www.anthropic.com/research/glm-5-3-and-the-spread-of-advanced-cyber-capabilities} \\
+S18 & Office of the Governor of California. \emph{California's nation-leading AI framework just got stronger}. 30 Sep 2026. \url{https://www.gov.ca.gov/2026/09/30/californias-nation-leading-ai-framework-just-got-stronger-governor-newsom-signs-more-first-in-the-nation-worker-protections-and-more/} \\
+S19 & The White House. \emph{Fact Sheet: President Donald J. Trump Inaugurates the Era of Super Intelligence}. 29 Sep 2026. \url{https://www.whitehouse.gov/fact-sheets/2026/09/fact-sheet-president-donald-j-trump-inaugurates-the-era-of-super-intelligence/} \\
+S20 & Anthropic. \emph{Anthropic invests \$100 million to train 10,000 engineers}. 2 Oct 2026. \url{https://www.anthropic.com/news/claude-frontier-academy} \\
+\bottomrule
+\end{tabularx}}
+
+\vspace{0.8em}
+{\footnotesize\color{brandgrey}
+Compiled \briefdate. Every figure in this brief was read from the linked primary
+source on that date. Corrections: \texttt{\briefauthor}.}
+
+\end{document}
